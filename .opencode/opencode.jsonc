@@ -86,6 +86,12 @@
       "url": "http://127.0.0.1:8081/mcp",
       "enabled": true,
       "timeout": 15000
+    },
+    "git_broker": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8082/mcp",
+      "enabled": true,
+      "timeout": 15000
     }
   }
 }

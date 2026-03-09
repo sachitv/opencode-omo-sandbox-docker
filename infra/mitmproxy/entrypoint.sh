@@ -4,6 +4,7 @@ set -euo pipefail
 PORT="${MITMPROXY_LISTEN_PORT:-8080}"
 MITM_USER="mitmproxy"
 MITM_UID="$(id -u "${MITM_USER}")"
+GIT_BROKER_UID="${GIT_BROKER_UID:-10001}"
 
 # Redirect standard web traffic from the shared namespace into mitmproxy before
 # the client process can connect directly to external port 80/443.
@@ -13,6 +14,9 @@ iptables -t nat -C OUTPUT -p tcp -j MITM_OUTPUT 2>/dev/null || \
   iptables -t nat -A OUTPUT -p tcp -j MITM_OUTPUT
 
 iptables -t nat -A MITM_OUTPUT -m owner --uid-owner "${MITM_UID}" -j RETURN
+# The git broker must reach GitHub SSH over 443 directly; do not transparently
+# redirect that traffic into the HTTP MITM.
+iptables -t nat -A MITM_OUTPUT -m owner --uid-owner "${GIT_BROKER_UID:-10001}" -p tcp --dport 443 -j RETURN
 iptables -t nat -A MITM_OUTPUT -d 127.0.0.0/8 -j RETURN
 iptables -t nat -A MITM_OUTPUT -p tcp --dport 80 -j REDIRECT --to-ports "${PORT}"
 iptables -t nat -A MITM_OUTPUT -p tcp --dport 443 -j REDIRECT --to-ports "${PORT}"
@@ -42,6 +46,11 @@ iptables -A MITM_FILTER_OUT -p udp --dport 443 -j REJECT
 iptables -A MITM_FILTER_OUT -m owner --uid-owner "${MITM_UID}" -p tcp --dport 80 -j RETURN
 iptables -A MITM_FILTER_OUT -m owner --uid-owner "${MITM_UID}" -p tcp --dport 443 -j RETURN
 iptables -A MITM_FILTER_OUT -m owner --uid-owner "${MITM_UID}" -j REJECT
+
+# The git broker gets the only non-HTTP egress exception in the shared
+# namespace so it can reach GitHub SSH over port 443 with its dedicated deploy
+# key without giving raw Git credentials to the workspace container.
+iptables -A MITM_FILTER_OUT -m owner --uid-owner "${GIT_BROKER_UID}" -p tcp --dport 443 -j RETURN
 
 # Everything else is denied by default for every process sharing this namespace.
 iptables -A MITM_FILTER_OUT -j REJECT

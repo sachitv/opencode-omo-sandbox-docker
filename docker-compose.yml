@@ -12,16 +12,21 @@ services:
         condition: service_started
       perplexity-mcp:
         condition: service_started
+      git-broker:
+        condition: service_started
     environment:
       OPENAI_BASE_URL: http://127.0.0.1:4000/v1
       PERPLEXITY_MCP_URL: http://127.0.0.1:8081/mcp
+      GIT_BROKER_MCP_URL: http://127.0.0.1:8082/mcp
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
       SSH_AUTH_SOCK: ""
     cap_drop:
       - NET_RAW
     network_mode: "service:mitmproxy"
     volumes:
+      # The workspace mount is the agent's working tree inside the devcontainer.
       - .:/workspaces/opencode-omo-sandbox-docker:cached
+      # Share the mitmproxy CA so TLS clients in the workspace trust the local MITM.
       - mitmproxy_certs:/mitmproxy-certs:ro
 
   openrouter-proxy:
@@ -45,6 +50,7 @@ services:
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
+      # Trust the same mitmproxy CA so the proxy can talk to upstream HTTPS through the MITM.
       - mitmproxy_certs:/mitmproxy-certs:ro
 
   perplexity-mcp:
@@ -66,7 +72,33 @@ services:
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
+      # Trust the mitmproxy CA for Perplexity API calls made from the MCP service.
       - mitmproxy_certs:/mitmproxy-certs:ro
+
+  # Narrow Git access broker. This is the only service that gets the dedicated
+  # host-side deploy-key agent state, and it exposes only MCP tools for fetch
+  # and push rather than raw credentials in the workspace.
+  git-broker:
+    build:
+      context: ./services/git-broker
+    depends_on:
+      mitmproxy:
+        condition: service_started
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8082
+      REPO_PATH: /repo
+      AGENT_STATE_DIR: /host-agent-state
+      AGENT_KEY_DIR: /host-agent-keys
+    network_mode: "service:mitmproxy"
+    volumes:
+      # Mount the repo so the broker can inspect origin, branch, and HEAD before
+      # allowing fetch/push operations on behalf of the agent.
+      - .:/repo:cached
+      # Mount only the recorded deploy-key policy state from the host.
+      - ${HOME}/.local/state/opencode-sandbox:/host-agent-state
+      # Mount the dedicated deploy private key read-only only into the broker.
+      - ${HOME}/.local/share/opencode-sandbox/keys:/host-agent-keys:ro
 
   mitmproxy:
     build:
@@ -77,8 +109,11 @@ services:
       - "127.0.0.1:4096:4096"
       - "127.0.0.1:4000:4000"
       - "127.0.0.1:8081:8081"
+      - "127.0.0.1:8082:8082"
       - "127.0.0.1:${MITMPROXY_PORT:-8080}:8080"
     volumes:
+      # Persist the generated mitmproxy CA so the other services can trust it
+      # across container restarts.
       - mitmproxy_certs:/home/mitmproxy/.mitmproxy
     cap_add:
       - NET_ADMIN

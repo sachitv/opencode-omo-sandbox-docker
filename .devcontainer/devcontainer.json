@@ -3,10 +3,9 @@
   "dockerComposeFile": [
     "../docker-compose.yml"
   ],
-  // These services use network_mode: "service:mitmproxy".
-  // The devcontainer CLI starts compose with --no-recreate, which can leave
-  // stale containers pointing at an old mitmproxy namespace after a rebuild.
-  "initializeCommand": "docker compose down --remove-orphans || true",
+  // Run the host-side deploy-key bootstrap before any images are built, then
+  // clear stale network namespace containers left behind by --no-recreate.
+  "initializeCommand": "./scripts/devcontainer-initialize-host.sh",
   "service": "workspace",
   "workspaceFolder": "/workspaces/opencode-omo-sandbox-docker",
   "runServices": [

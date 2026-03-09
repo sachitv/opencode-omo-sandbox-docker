@@ -5,6 +5,7 @@ This repository contains a Docker Compose-backed devcontainer with an explicit e
 - `workspace`: the Ubuntu devcontainer you open in VS Code / Dev Containers, with Bun in the base image and OpenCode installed by the devcontainer feature.
 - `openrouter-proxy`: an OpenAI-compatible proxy that injects your OpenRouter key.
 - `perplexity-mcp`: an HTTP MCP server backed by `@perplexity-ai/mcp-server`.
+- `git-broker`: a narrow MCP service, implemented in TypeScript and run with Bun, that can fetch and push Git over SSH using a dedicated repo deploy key mounted only into that service.
 - `mitmproxy`: the only service with external network access. Everything else sits on an internal-only Docker network and must reach the internet through this proxy.
 - `.opencode/opencode.jsonc`: project-level OpenCode config wired to the internal proxy and MCP service.
 
@@ -67,14 +68,15 @@ Use `Dev Containers: Rebuild and Reopen in Container` from VS Code to restart it
 
 ## Deploy Key Automation
 
-For Git push isolation, the preferred model is a dedicated deploy key plus a
-dedicated ssh-agent socket that will eventually be mounted only into a narrow
-push-broker container, not into the `workspace` container.
+For Git isolation, the preferred model is a dedicated deploy key whose private
+key is mounted read-only only into a narrow `git-broker` container, not into
+the `workspace` container.
 
 The host-side setup helpers are:
 
 - [setup-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/setup-agent-deploy-key.py)
 - [revoke-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/revoke-agent-deploy-key.py)
+- [devcontainer-initialize-host.sh](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/devcontainer-initialize-host.sh)
 
 `setup-agent-deploy-key.py` will:
 
@@ -82,7 +84,6 @@ The host-side setup helpers are:
 - record the current `origin` URL and branch as the intended push policy
 - generate a fresh `ed25519` keypair on the host
 - add the public key to GitHub as a write-enabled deploy key for that repo
-- start a dedicated `ssh-agent` socket holding only that key
 - write a state file under `~/.local/state/opencode-sandbox/`
 
 Example:
@@ -91,8 +92,74 @@ Example:
 python3 scripts/setup-agent-deploy-key.py
 ```
 
-`revoke-agent-deploy-key.py` removes the managed deploy key from GitHub, stops
-the dedicated `ssh-agent`, and deletes the generated key material:
+`devcontainer up` now runs the host-side initializer automatically before any
+containers are built. That initializer will:
+
+- ensure a managed deploy-key state already exists, or create one if it does not
+- detect stale shared-network namespace containers from previous runs and only
+  then run `docker compose down --remove-orphans`
+- compare a fingerprint of the devcontainer and service build inputs against the
+  previous startup, and tear Compose down if those baked inputs changed
+
+So the first `devcontainer up` on a new host checkout now assumes:
+
+- `gh auth login` has already been completed on the host
+- the authenticated user has permission to manage deploy keys on the repository
+
+### What The Host Init Script Does
+
+If the shell script is hard to read, the behavior is simpler than it looks.
+[devcontainer-initialize-host.sh](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/devcontainer-initialize-host.sh)
+runs on the host before the devcontainer starts and does exactly two things:
+
+1. It runs [setup-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/setup-agent-deploy-key.py)
+   with `--ensure`.
+   That means:
+   - if a managed deploy key already exists for this repository, leave it alone
+   - if it does not exist yet, create it and record the deploy-key state
+
+2. It checks whether any of the namespace-sharing services:
+   - `workspace`
+   - `openrouter-proxy`
+   - `perplexity-mcp`
+
+   still point at a dead `mitmproxy` network namespace from an older run.
+
+That second check matters because those services use Docker's
+`network_mode: "service:mitmproxy"` pattern. After a rebuild, Docker can leave a
+container referring to an old container id that no longer exists. When that
+happens, the next `devcontainer up` can fail with a "joining network namespace"
+error.
+
+The script also fingerprints the files that affect the devcontainer images and
+service images, including:
+
+- [docker-compose.yml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/docker-compose.yml)
+- [.devcontainer](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/.devcontainer)
+- [infra](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra)
+- [services](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/services)
+
+If any of those files change, such as
+[allowed-hosts.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowed-hosts.yaml),
+the script forces a Compose teardown before the next startup so the changed
+image build inputs are not masked by container reuse.
+
+The script detects that case like this:
+
+- ask Docker for the current container id for each service
+- inspect its configured network mode
+- if the network mode looks like `container:<id>`, inspect that target id too
+- if the target container no longer exists, run:
+
+```sh
+docker compose down --remove-orphans
+```
+
+If no stale namespace reference exists, it does nothing and startup continues
+normally.
+
+`revoke-agent-deploy-key.py` removes the managed deploy key from GitHub and
+deletes the generated key material:
 
 ```sh
 python3 scripts/revoke-agent-deploy-key.py
@@ -104,9 +171,8 @@ These scripts require:
 - repository admin rights, because GitHub deploy keys are managed through the
   repository deploy-key API
 
-This repo does not yet include the push-broker container itself. The scripts
-set up the credential side first so that a future broker can mount only the
-dedicated `SSH_AUTH_SOCK` instead of inheriting the user's normal host agent.
+The broker now mounts only the dedicated host state directory and exposes a
+small MCP surface instead of raw Git credentials inside the workspace.
 
 ## Inside the devcontainer
 
@@ -114,12 +180,14 @@ These environment variables are preconfigured:
 
 - `OPENAI_BASE_URL=http://127.0.0.1:4000/v1`
 - `PERPLEXITY_MCP_URL=http://127.0.0.1:8081/mcp`
+- `GIT_BROKER_MCP_URL=http://127.0.0.1:8082/mcp`
 - `NODE_EXTRA_CA_CERTS=/mitmproxy-certs/mitmproxy-ca-cert.pem`
 
 That means:
 
 - OpenAI-compatible clients can target the local OpenRouter proxy without carrying the real key.
 - Perplexity MCP is reachable over the Docker network.
+- The Git broker MCP can fetch from origin and push the current branch using the dedicated deploy key without exposing that key in the workspace container.
 - General outbound HTTP(S) traffic is transparently redirected through `mitmproxy` and constrained by the allowlist.
 - QUIC / HTTP/3 is blocked by rejecting outbound UDP on ports `80` and `443` in the shared namespace.
 - Non-web outbound traffic is blocked by the shared namespace firewall unless it is loopback traffic.
@@ -143,6 +211,7 @@ All published service ports are bound to `127.0.0.1` on the host, so they are on
 
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
 - The transparent proxy path now relies on the mitmproxy CA being trusted by the runtime containers. The devcontainer startup script imports that CA into the Ubuntu trust store, and the Node-based helper services use `NODE_EXTRA_CA_CERTS`.
+- The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
 - The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` only for installing the mitmproxy CA into the container trust store.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.
 - The MITM policy logic lives in [allowlist.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowlist.py), and the editable host policy lives in [allowed-hosts.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowed-hosts.yaml).
