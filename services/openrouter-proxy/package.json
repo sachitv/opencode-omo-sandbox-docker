@@ -1,0 +1,5 @@
+{
+  "name": "openrouter-proxy",
+  "private": true,
+  "type": "module"
+}

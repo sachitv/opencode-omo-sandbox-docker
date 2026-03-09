@@ -1,0 +1,93 @@
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    command: sleep infinity
+    init: true
+    depends_on:
+      mitmproxy:
+        condition: service_started
+      openrouter-proxy:
+        condition: service_started
+      perplexity-mcp:
+        condition: service_started
+    environment:
+      OPENAI_BASE_URL: http://127.0.0.1:4000/v1
+      PERPLEXITY_MCP_URL: http://127.0.0.1:8081/mcp
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
+      SSH_AUTH_SOCK: ""
+    network_mode: "service:mitmproxy"
+    volumes:
+      - .:/workspaces/opencode-omo-sandbox-docker:cached
+      - mitmproxy_certs:/mitmproxy-certs:ro
+
+  openrouter-proxy:
+    build:
+      context: ./services/openrouter-proxy
+    depends_on:
+      mitmproxy:
+        condition: service_started
+    command:
+      - sh
+      - -lc
+      - |
+        until [ -f /mitmproxy-certs/mitmproxy-ca-cert.pem ]; do sleep 1; done
+        exec node server.js
+    environment:
+      PORT: 4000
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-https://example.com}
+      OPENROUTER_X_TITLE: ${OPENROUTER_X_TITLE:-opencode-devcontainer}
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
+    network_mode: "service:mitmproxy"
+    volumes:
+      - mitmproxy_certs:/mitmproxy-certs:ro
+
+  perplexity-mcp:
+    build:
+      context: ./services/perplexity-mcp
+    depends_on:
+      mitmproxy:
+        condition: service_started
+    command:
+      - sh
+      - -lc
+      - |
+        until [ -f /mitmproxy-certs/mitmproxy-ca-cert.pem ]; do sleep 1; done
+        exec node http-wrapper.mjs
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8081
+      PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY}
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
+    network_mode: "service:mitmproxy"
+    volumes:
+      - mitmproxy_certs:/mitmproxy-certs:ro
+
+  mitmproxy:
+    build:
+      context: ./infra/mitmproxy
+    environment:
+      MITMPROXY_LISTEN_PORT: 8080
+    ports:
+      - "4096:4096"
+      - "4000:4000"
+      - "8081:8081"
+      - "${MITMPROXY_PORT:-8080}:8080"
+    volumes:
+      - mitmproxy_certs:/home/mitmproxy/.mitmproxy
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - ai_boundary
+      - ai_egress
+
+networks:
+  ai_boundary:
+    internal: true
+  ai_egress: {}
+
+volumes:
+  mitmproxy_certs: {}

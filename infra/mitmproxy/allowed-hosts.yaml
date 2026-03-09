@@ -1,0 +1,46 @@
+# Exact host matches.
+# Use this for stable API hosts and registries.
+exact:
+  - perplexity.ai
+  - api.perplexity.ai
+  - openrouter.ai
+  - api.openrouter.ai
+
+  # GitHub and release assets
+  - github.com
+  - api.github.com
+  - raw.githubusercontent.com
+  - codeload.github.com
+  - objects.githubusercontent.com
+  - release-assets.githubusercontent.com
+
+  # npm
+  - registry.npmjs.org
+
+  # Python
+  - pypi.org
+  - files.pythonhosted.org
+
+  # Rust / Cargo
+  - crates.io
+  - index.crates.io
+  - static.crates.io
+
+  # Go
+  - proxy.golang.org
+  - sum.golang.org
+
+  # Ruby
+  - rubygems.org
+
+  # Debian / Ubuntu package repositories
+  - archive.ubuntu.com
+  - security.ubuntu.com
+  - deb.debian.org
+  - google.com
+
+# Wildcard suffixes.
+# "*.example.com" matches "foo.example.com" but not bare "example.com".
+wildcards:
+  - "*.opencode.ai"
+  - "*.google.com"

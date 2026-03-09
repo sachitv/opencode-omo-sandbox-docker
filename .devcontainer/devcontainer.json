@@ -1,0 +1,46 @@
+{
+  "name": "Opencode Sandbox",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  // These services use network_mode: "service:mitmproxy".
+  // The devcontainer CLI starts compose with --no-recreate, which can leave
+  // stale containers pointing at an old mitmproxy namespace after a rebuild.
+  "initializeCommand": "docker compose down --remove-orphans || true",
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/opencode-omo-sandbox-docker",
+  "runServices": [
+    "mitmproxy",
+    "openrouter-proxy",
+    "perplexity-mcp",
+    "workspace"
+  ],
+  "shutdownAction": "stopCompose",
+  "overrideCommand": false,
+  "postStartCommand": "/usr/local/bin/start-opencode-server.sh",
+  "remoteUser": "agent",
+  "containerEnv": {
+    "OPENAI_BASE_URL": "http://127.0.0.1:4000/v1",
+    "PERPLEXITY_MCP_URL": "http://127.0.0.1:8081/mcp",
+    "NODE_EXTRA_CA_CERTS": "/mitmproxy-certs/mitmproxy-ca-cert.pem"
+  },
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": ""
+  },
+  "forwardPorts": [
+    4096,
+    8080,
+    4000,
+    8081
+  ],
+  "features": {
+    "ghcr.io/sachitv/devcontainer-features/opencode:1.0.1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

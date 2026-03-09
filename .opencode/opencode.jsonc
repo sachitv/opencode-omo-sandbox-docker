@@ -1,0 +1,91 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "server": {
+    "hostname": "0.0.0.0",
+    "port": 4096
+  },
+
+  // Use only free OpenRouter models in this sandbox.
+  "model": "openrouter/openrouter/free",
+  "small_model": "openrouter/arcee-ai/trinity-mini:free",
+
+  "provider": {
+    "openrouter": {
+      "name": "OpenRouter Proxy",
+      "npm": "@ai-sdk/openai-compatible",
+      "env": [],
+      "models": {
+        "openrouter/free": {
+          "name": "OpenRouter Free Models Router",
+          "tool_call": true,
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        },
+        "stepfun/step-3.5-flash:free": {
+          "name": "Step 3.5 Flash (free)",
+          "tool_call": true,
+          "limit": {
+            "context": 256000,
+            "output": 64000
+          }
+        },
+        "arcee-ai/trinity-large-preview:free": {
+          "name": "Trinity Large Preview (free)",
+          "tool_call": true,
+          "limit": {
+            "context": 131000,
+            "output": 64000
+          }
+        },
+        "arcee-ai/trinity-mini:free": {
+          "name": "Trinity Mini (free)",
+          "tool_call": true,
+          "limit": {
+            "context": 131072,
+            "output": 32000
+          }
+        },
+        "nvidia/nemotron-3-nano-30b-a3b:free": {
+          "name": "Nemotron 3 Nano 30B A3B (free)",
+          "tool_call": true,
+          "limit": {
+            "context": 256000,
+            "output": 32000
+          }
+        },
+        "meta-llama/llama-3.3-70b-instruct:free": {
+          "name": "Llama 3.3 70B Instruct (free)",
+          "tool_call": true,
+          "limit": {
+            "context": 128000,
+            "output": 16000
+          }
+        },
+        "upstage/solar-pro-3:free": {
+          "name": "Solar Pro 3 (free)",
+          "tool_call": true,
+          "limit": {
+            "context": 128000,
+            "output": 16000
+          }
+        }
+      },
+      "options": {
+        "apiKey": "proxy",
+        "baseURL": "http://127.0.0.1:4000/v1"
+      }
+    }
+  },
+
+  "mcp": {
+    "perplexity": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8081/mcp",
+      "enabled": true,
+      "timeout": 15000
+    }
+  }
+}

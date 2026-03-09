@@ -1,0 +1,7 @@
+{
+  "name": "perplexity-mcp-service",
+  "private": true,
+  "dependencies": {
+    "@perplexity-ai/mcp-server": "latest"
+  }
+}
