@@ -38,7 +38,11 @@ RUN ln -sf /usr/local/bin/bun /usr/local/bin/bunx && \
     if ! id -u "${USERNAME}" >/dev/null 2>&1; then \
       useradd --create-home --shell /bin/bash "${USERNAME}"; \
     fi && \
-    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" && \
+    # Only allow the CA trust-store updates needed by start-opencode-server.sh.
+    printf '%s\n' \
+      "${USERNAME} ALL=(root) NOPASSWD: /bin/cp /mitmproxy-certs/mitmproxy-ca-cert.pem /usr/local/share/ca-certificates/mitmproxy-ca-cert.crt" \
+      "${USERNAME} ALL=(root) NOPASSWD: /usr/sbin/update-ca-certificates" \
+      > "/etc/sudoers.d/${USERNAME}" && \
     chmod 0440 "/etc/sudoers.d/${USERNAME}"
 
 USER ${USERNAME}

@@ -26,22 +26,19 @@ iptables -C OUTPUT -j MITM_FILTER_OUT 2>/dev/null || iptables -A OUTPUT -j MITM_
 iptables -A MITM_FILTER_OUT -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
 iptables -A MITM_FILTER_OUT -d 127.0.0.0/8 -j RETURN
 
-# DNS is still needed for the proxy itself to resolve approved upstream hosts.
-iptables -A MITM_FILTER_OUT -p udp --dport 53 -j RETURN
-iptables -A MITM_FILTER_OUT -p tcp --dport 53 -j RETURN
+# DNS is only allowed through Docker's loopback resolver (typically
+# 127.0.0.11), which is already covered by the loopback allow rule above.
+# Do not allow arbitrary port 53 egress, or the workspace can use DNS as a
+# generic exfiltration channel.
 
 # Block the usual QUIC / HTTP3 path so clients cannot bypass the transparent TCP
 # proxy by talking to upstreams over UDP.
 iptables -A MITM_FILTER_OUT -p udp --dport 80 -j REJECT
 iptables -A MITM_FILTER_OUT -p udp --dport 443 -j REJECT
 
-# Client processes in the shared namespace may only originate DNS plus web
-# traffic that gets transparently redirected into the local proxy.
-iptables -A MITM_FILTER_OUT -p tcp --dport 80 -j RETURN
-iptables -A MITM_FILTER_OUT -p tcp --dport 443 -j RETURN
-
-# The proxy process itself is only allowed to resolve hosts and then open the
-# upstream TCP 80/443 connections needed to service approved requests.
+# Client-side web traffic has already been redirected to loopback by NAT, so
+# the loopback RETURN above is what permits it. Only the proxy UID itself
+# should ever open upstream TCP 80/443 connections.
 iptables -A MITM_FILTER_OUT -m owner --uid-owner "${MITM_UID}" -p tcp --dport 80 -j RETURN
 iptables -A MITM_FILTER_OUT -m owner --uid-owner "${MITM_UID}" -p tcp --dport 443 -j RETURN
 iptables -A MITM_FILTER_OUT -m owner --uid-owner "${MITM_UID}" -j REJECT

@@ -11,6 +11,7 @@ until [[ -f /mitmproxy-certs/mitmproxy-ca-cert.pem ]]; do
 done
 
 if [[ -f /mitmproxy-certs/mitmproxy-ca-cert.pem ]]; then
+  # The devcontainer user only has sudo for these trust-store updates.
   sudo cp /mitmproxy-certs/mitmproxy-ca-cert.pem /usr/local/share/ca-certificates/mitmproxy-ca-cert.crt
   sudo update-ca-certificates >/dev/null 2>&1 || true
 fi

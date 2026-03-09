@@ -17,6 +17,8 @@ services:
       PERPLEXITY_MCP_URL: http://127.0.0.1:8081/mcp
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
       SSH_AUTH_SOCK: ""
+    cap_drop:
+      - NET_RAW
     network_mode: "service:mitmproxy"
     volumes:
       - .:/workspaces/opencode-omo-sandbox-docker:cached
@@ -72,10 +74,10 @@ services:
     environment:
       MITMPROXY_LISTEN_PORT: 8080
     ports:
-      - "4096:4096"
-      - "4000:4000"
-      - "8081:8081"
-      - "${MITMPROXY_PORT:-8080}:8080"
+      - "127.0.0.1:4096:4096"
+      - "127.0.0.1:4000:4000"
+      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:${MITMPROXY_PORT:-8080}:8080"
     volumes:
       - mitmproxy_certs:/home/mitmproxy/.mitmproxy
     cap_add:

@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.20.0
 
-FROM mitmproxy/mitmproxy:latest
+# Pin mitmproxy to a specific stable release so the network boundary does not
+# silently change under us on rebuild.
+FROM mitmproxy/mitmproxy:12.2.1
 
 USER root
 

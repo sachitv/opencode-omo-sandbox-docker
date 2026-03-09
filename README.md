@@ -15,7 +15,7 @@ The `ai_boundary` Docker network is marked `internal: true`, and the `workspace`
 The shared namespace is also configured as default-deny for outbound traffic. In practice that means:
 
 - loopback traffic between `workspace`, `openrouter-proxy`, `perplexity-mcp`, and `mitmproxy` is allowed
-- DNS is allowed so the proxy can resolve approved upstream hosts
+- DNS is only available through Docker's embedded loopback resolver rather than arbitrary port `53` egress
 - TCP `80` and `443` are the only non-local outbound ports permitted, and those client connections are transparently redirected into `mitmproxy`
 - all other outbound traffic is rejected
 
@@ -65,6 +65,49 @@ docker compose down
 
 Use `Dev Containers: Rebuild and Reopen in Container` from VS Code to restart it.
 
+## Deploy Key Automation
+
+For Git push isolation, the preferred model is a dedicated deploy key plus a
+dedicated ssh-agent socket that will eventually be mounted only into a narrow
+push-broker container, not into the `workspace` container.
+
+The host-side setup helpers are:
+
+- [setup-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/setup-agent-deploy-key.py)
+- [revoke-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/revoke-agent-deploy-key.py)
+
+`setup-agent-deploy-key.py` will:
+
+- resolve the current GitHub repository
+- record the current `origin` URL and branch as the intended push policy
+- generate a fresh `ed25519` keypair on the host
+- add the public key to GitHub as a write-enabled deploy key for that repo
+- start a dedicated `ssh-agent` socket holding only that key
+- write a state file under `~/.local/state/opencode-sandbox/`
+
+Example:
+
+```sh
+python3 scripts/setup-agent-deploy-key.py
+```
+
+`revoke-agent-deploy-key.py` removes the managed deploy key from GitHub, stops
+the dedicated `ssh-agent`, and deletes the generated key material:
+
+```sh
+python3 scripts/revoke-agent-deploy-key.py
+```
+
+These scripts require:
+
+- `gh auth login` on the host
+- repository admin rights, because GitHub deploy keys are managed through the
+  repository deploy-key API
+
+This repo does not yet include the push-broker container itself. The scripts
+set up the credential side first so that a future broker can mount only the
+dedicated `SSH_AUTH_SOCK` instead of inheriting the user's normal host agent.
+
 ## Inside the devcontainer
 
 These environment variables are preconfigured:
@@ -79,7 +122,8 @@ That means:
 - Perplexity MCP is reachable over the Docker network.
 - General outbound HTTP(S) traffic is transparently redirected through `mitmproxy` and constrained by the allowlist.
 - QUIC / HTTP/3 is blocked by rejecting outbound UDP on ports `80` and `443` in the shared namespace.
-- Non-web outbound traffic is blocked by the shared namespace firewall unless it is loopback traffic or DNS.
+- Non-web outbound traffic is blocked by the shared namespace firewall unless it is loopback traffic.
+- `workspace` drops `NET_RAW`, so unprivileged processes cannot open raw packet sockets to bypass the normal egress path.
 
 ## OpenCode server access
 
@@ -93,12 +137,15 @@ http://localhost:4096
 
 That lets you attach from your local machine with an SDK or CLI client while the actual OpenCode process stays inside the devcontainer boundary.
 
+All published service ports are bound to `127.0.0.1` on the host, so they are only reachable from the local machine rather than every host interface.
+
 ## Notes
 
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
 - The transparent proxy path now relies on the mitmproxy CA being trusted by the runtime containers. The devcontainer startup script imports that CA into the Ubuntu trust store, and the Node-based helper services use `NODE_EXTRA_CA_CERTS`.
-- The devcontainer runs as a non-root `agent` user with passwordless `sudo`.
+- The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` only for installing the mitmproxy CA into the container trust store.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.
 - The MITM policy logic lives in [allowlist.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowlist.py), and the editable host policy lives in [allowed-hosts.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowed-hosts.yaml).
 - Both policy files are copied into the `mitmproxy` image at build time rather than mounted at runtime.
 - Editing the policy files in the repo does not affect an already-built or already-running proxy. Rebuild the `mitmproxy` image and recreate the container for policy changes to take effect.
+- The MITM base image is pinned to a specific `mitmproxy` release rather than `latest` so rebuilds stay predictable.
