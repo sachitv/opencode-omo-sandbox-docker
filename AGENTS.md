@@ -61,12 +61,15 @@ cannot, suspect a stale or inconsistent shared-namespace lifecycle state first.
 
 ## Credential Model
 
-Do not put real credentials in repo files.
+Putting real credentials in repo files is not recommended.
 
 The intended model is:
 
-- `OPENROUTER_API_KEY` and `PERPLEXITY_API_KEY` come from the host environment
-  or an external secrets file
+- `OPENROUTER_API_KEY`, `PERPLEXITY_API_KEY`, and `BRAVE_API_KEY` come from the
+  host environment or an external secrets file
+- the workspace masks the repo-root `.env` path with the tracked
+  `.env.example`, so a real host-side repo `.env` should not be visible inside
+  the container
 - the workspace does not get raw Git push credentials
 - GitHub access is handled by `git-broker`
 - `git-broker` mounts host-managed deploy-key state from:

@@ -156,11 +156,19 @@ The default allowlist includes:
 
 ## Bring it up
 
-Do not put real credentials in a `.env` file inside this repository if you want the agent sandbox to avoid seeing them. Credentials stored in repo files weaken the boundary and are easy to handle incorrectly.
+Putting real credentials in a `.env` file inside this repository is not
+recommended if you want the agent sandbox to avoid seeing them. Credentials
+stored in repo files weaken the boundary and are easy to handle incorrectly.
+
+This repo includes a tracked
+[.env.example](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/.env.example)
+with empty values, and the workspace always mounts that file at the repo-root
+`.env` path inside the container. That means a real host-side repo-root `.env`
+is masked inside the workspace by default.
 
 Recommended approaches:
 
-1. Export `OPENROUTER_API_KEY` and `PERPLEXITY_API_KEY` in the host shell before starting the devcontainer.
+1. Export `OPENROUTER_API_KEY`, `PERPLEXITY_API_KEY`, and `BRAVE_API_KEY` in the host shell before starting the devcontainer.
 2. Or pass secrets from outside the repo with the Dev Container CLI.
 3. Then open the repository in a Dev Container from VS Code, or start it with the Dev Container CLI.
 
@@ -169,6 +177,7 @@ Example CLI flow:
 ```sh
 export OPENROUTER_API_KEY=...
 export PERPLEXITY_API_KEY=...
+export BRAVE_API_KEY=...
 devcontainer up --workspace-folder .
 devcontainer exec --workspace-folder . bash
 ```

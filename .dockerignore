@@ -4,8 +4,3 @@
 **/.env.*
 !.env.example
 !**/.env.example
-.data/
-STATE_DIR/
-__pycache__/
-node_modules/
-npm-debug.log*
