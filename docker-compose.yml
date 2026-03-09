@@ -14,10 +14,13 @@ services:
         condition: service_started
       git-broker:
         condition: service_started
+      brave-search-mcp:
+        condition: service_started
     environment:
       OPENAI_BASE_URL: http://127.0.0.1:4000/v1
       PERPLEXITY_MCP_URL: http://127.0.0.1:8081/mcp
       GIT_BROKER_MCP_URL: http://127.0.0.1:8082/mcp
+      BRAVE_SEARCH_MCP_URL: http://127.0.0.1:8083/mcp
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
       SSH_AUTH_SOCK: ""
     cap_drop:
@@ -100,6 +103,23 @@ services:
       # Mount the dedicated deploy private key read-only only into the broker.
       - ${HOME}/.local/share/opencode-sandbox/keys:/host-agent-keys:ro
 
+  brave-search-mcp:
+    image: mcp/brave-search:latest
+    depends_on:
+      mitmproxy:
+        condition: service_started
+    environment:
+      BRAVE_API_KEY: ${BRAVE_API_KEY}
+      BRAVE_MCP_TRANSPORT: http
+      BRAVE_MCP_PORT: 8083
+      BRAVE_MCP_HOST: 0.0.0.0
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
+    network_mode: "service:mitmproxy"
+    volumes:
+      # Trust the mitmproxy CA if the Brave MCP server makes outbound HTTPS
+      # requests through the shared transparent proxy path.
+      - mitmproxy_certs:/mitmproxy-certs:ro
+
   mitmproxy:
     build:
       context: ./infra/mitmproxy
@@ -110,6 +130,7 @@ services:
       - "127.0.0.1:4000:4000"
       - "127.0.0.1:8081:8081"
       - "127.0.0.1:8082:8082"
+      - "127.0.0.1:8083:8083"
       - "127.0.0.1:${MITMPROXY_PORT:-8080}:8080"
     volumes:
       # Persist the generated mitmproxy CA so the other services can trust it

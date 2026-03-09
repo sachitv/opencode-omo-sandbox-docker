@@ -92,6 +92,12 @@
       "url": "http://127.0.0.1:8082/mcp",
       "enabled": true,
       "timeout": 15000
+    },
+    "brave_search": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8083/mcp",
+      "enabled": true,
+      "timeout": 15000
     }
   }
 }

@@ -40,6 +40,7 @@ The main runtime components are:
 - `workspace`: the Ubuntu devcontainer you open in VS Code / Dev Containers
 - `openrouter-proxy`: an OpenAI-compatible proxy that injects your OpenRouter key
 - `perplexity-mcp`: an HTTP MCP server backed by `@perplexity-ai/mcp-server`
+- `brave-search-mcp`: an HTTP MCP server backed by the official Brave Search MCP image
 - `git-broker`: a narrow MCP service for Git fetch/push using a dedicated repo deploy key
 - `mitmproxy`: the only service with normal external egress
 - `.opencode/opencode.jsonc`: project-level OpenCode config that points OpenCode at the local proxy and MCP services
@@ -53,6 +54,7 @@ flowchart LR
   Workspace[workspace<br/>OpenCode runs here]
   OpenRouter[openrouter-proxy<br/>OpenAI-compatible]
   Perplexity[perplexity-mcp]
+  Brave[brave-search-mcp]
   GitBroker[git-broker]
   Mitm[mitmproxy]
   Internet[Allowed external services]
@@ -62,11 +64,13 @@ flowchart LR
 
   Workspace -->|:4000/v1| OpenRouter
   Workspace -->|:8081/mcp| Perplexity
+  Workspace -->|:8083/mcp| Brave
   Workspace -->|:8082/mcp| GitBroker
 
   Workspace -. shares netns .-> Mitm
   OpenRouter -. shares netns .-> Mitm
   Perplexity -. shares netns .-> Mitm
+  Brave -. shares netns .-> Mitm
   GitBroker -. shares netns .-> Mitm
 
   Mitm --> Internet
@@ -75,7 +79,7 @@ flowchart LR
 ### Network Boundary
 
 The `ai_boundary` Docker network is marked `internal: true`. The `workspace`,
-`openrouter-proxy`, `perplexity-mcp`, and `git-broker` services all use
+`openrouter-proxy`, `perplexity-mcp`, `brave-search-mcp`, and `git-broker` services all use
 `network_mode: "service:mitmproxy"`, so they share the `mitmproxy` network
 namespace instead of getting their own independent egress path.
 
@@ -184,6 +188,95 @@ docker compose down
 ```
 
 Use `Dev Containers: Rebuild and Reopen in Container` from VS Code to restart it.
+
+## MCP Configuration
+
+The project-level MCP configuration lives in
+[.opencode/opencode.jsonc](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/.opencode/opencode.jsonc).
+
+Right now it includes:
+
+- `perplexity`: a remote MCP served by the local `perplexity-mcp` container
+- `brave_search`: a remote MCP served by the local `brave-search-mcp` container
+- `git_broker`: a remote MCP served by the local `git-broker` container
+
+### Optional Brave Search MCP
+
+The Brave Search service uses the official Brave Search MCP server:
+
+- GitHub: https://github.com/brave/brave-search-mcp-server
+- Image: `mcp/brave-search:latest`
+
+It is exposed to OpenCode as a normal remote MCP:
+
+```jsonc
+"brave_search": {
+  "type": "remote",
+  "url": "http://127.0.0.1:8083/mcp",
+  "enabled": false
+}
+```
+
+The container itself is started by Docker Compose, not by OpenCode.
+
+It also requires a Brave Search API key to be present as `BRAVE_API_KEY`.
+
+### Adding More MCP Servers
+
+There are two patterns in this repo:
+
+1. Remote MCP services, exposed on `127.0.0.1` inside the shared namespace
+
+   This is the preferred pattern for this sandbox.
+
+   Example:
+
+```jsonc
+"some_remote_server": {
+  "type": "remote",
+  "url": "http://127.0.0.1:8089/mcp",
+  "enabled": true,
+  "timeout": 15000
+}
+```
+
+2. Local command-based MCP servers
+
+   This is useful for simple utilities or one-off tools, but it runs the
+   command from inside the workspace container.
+
+   Example:
+
+```jsonc
+"some_local_server": {
+  "type": "local",
+  "command": ["npx", "-y", "some-mcp-package"],
+  "enabled": true,
+  "timeout": 15000
+}
+```
+
+For Docker-backed local MCP servers, be explicit about the tradeoff:
+
+- they require a working `docker` binary in the workspace
+- they require access to a Docker daemon socket
+- that substantially weakens the sandbox boundary
+
+Recommendation:
+
+- prefer remote MCP services added to `docker-compose.yml`
+- use local command MCPs only when they do not require broad new privileges
+- treat Docker-backed local MCPs as opt-in and higher risk
+
+When adding a new MCP server that makes outbound network calls, also update
+[allowed-hosts.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowed-hosts.yaml)
+with the upstream hosts it needs.
+
+Otherwise the container may start successfully but all real requests will still
+be blocked by the `mitmproxy` allowlist.
+
+Because the allowlist is baked into the `mitmproxy` image, changing it requires
+a rebuild/recreate before the new MCP server can actually reach those hosts.
 
 ## Deploy Key Automation
 
@@ -301,12 +394,14 @@ These environment variables are preconfigured:
 - `OPENAI_BASE_URL=http://127.0.0.1:4000/v1`
 - `PERPLEXITY_MCP_URL=http://127.0.0.1:8081/mcp`
 - `GIT_BROKER_MCP_URL=http://127.0.0.1:8082/mcp`
+- `BRAVE_SEARCH_MCP_URL=http://127.0.0.1:8083/mcp`
 - `NODE_EXTRA_CA_CERTS=/mitmproxy-certs/mitmproxy-ca-cert.pem`
 
 That means:
 
 - OpenAI-compatible clients can target the local OpenRouter proxy without carrying the real key.
 - Perplexity MCP is reachable over the Docker network.
+- Brave Search MCP is reachable over the Docker network.
 - The Git broker MCP can fetch from origin and push the current branch using the dedicated deploy key without exposing that key in the workspace container.
 - General outbound HTTP(S) traffic is transparently redirected through `mitmproxy` and constrained by the allowlist.
 - QUIC / HTTP/3 is blocked by rejecting outbound UDP on ports `80` and `443` in the shared namespace.

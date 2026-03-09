@@ -170,6 +170,26 @@ Current implementation details:
 - it forces GitHub SSH over `ssh.github.com:443`
 - it uses a mounted private key, not a mounted host `SSH_AUTH_SOCK`
 
+## MCP Extension Guidance
+
+This repo supports two MCP integration styles:
+
+- `remote` MCP servers exposed on local ports by Compose services
+- `local` command-based MCP servers started from inside the workspace
+
+Prefer `remote` MCP servers for this sandbox.
+
+Be careful with Docker-backed `local` MCP servers:
+
+- they require Docker CLI access in the workspace
+- they require Docker daemon access in the workspace
+- that weakens the boundary more than normal remote MCP services
+
+The optional `weather_docker` entry in `.opencode/opencode.jsonc` is present as
+The optional `brave_search_docker` entry in `.opencode/opencode.jsonc` is
+present as an example, but it is intentionally disabled by default for that
+reason.
+
 ## OpenCode Expectations
 
 OpenCode is started manually inside the devcontainer with `opencode serve`.

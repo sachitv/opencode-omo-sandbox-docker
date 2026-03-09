@@ -5,6 +5,7 @@ exact:
   - api.perplexity.ai
   - openrouter.ai
   - api.openrouter.ai
+  - search.brave.com
   - sachit.me
 
   # GitHub and release assets
@@ -44,4 +45,5 @@ exact:
 # "*.example.com" matches "foo.example.com" but not bare "example.com".
 wildcards:
   - "*.opencode.ai"
+  - "*.search.brave.com"
   - "*.google.com"
