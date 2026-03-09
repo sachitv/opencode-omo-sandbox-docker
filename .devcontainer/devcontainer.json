@@ -16,7 +16,6 @@
   ],
   "shutdownAction": "stopCompose",
   "overrideCommand": false,
-  "postStartCommand": "/usr/local/bin/start-opencode-server.sh",
   "remoteUser": "agent",
   "containerEnv": {
     "OPENAI_BASE_URL": "http://127.0.0.1:4000/v1",

@@ -1,35 +1,154 @@
 # Opencode Sandbox Devcontainer
 
-This repository contains a Docker Compose-backed devcontainer with an explicit egress boundary:
+This repository sets up a devcontainer for running OpenCode, or another agentic
+CLI, inside a constrained Docker sandbox.
 
-- `workspace`: the Ubuntu devcontainer you open in VS Code / Dev Containers, with Bun in the base image and OpenCode installed by the devcontainer feature.
-- `openrouter-proxy`: an OpenAI-compatible proxy that injects your OpenRouter key.
-- `perplexity-mcp`: an HTTP MCP server backed by `@perplexity-ai/mcp-server`.
-- `git-broker`: a narrow MCP service, implemented in TypeScript and run with Bun, that can fetch and push Git over SSH using a dedicated repo deploy key mounted only into that service.
-- `mitmproxy`: the only service with external network access. Everything else sits on an internal-only Docker network and must reach the internet through this proxy.
-- `.opencode/opencode.jsonc`: project-level OpenCode config wired to the internal proxy and MCP service.
+The goal is not perfect isolation. The goal is a practical environment with:
 
-## Why this layout
+- a normal editor and devcontainer workflow
+- a high-confidence egress boundary for the agent
+- explicit MCP and model access paths
+- Git access brokered separately from the main workspace
+- host-managed credentials that do not live in the workspace itself
 
-The `ai_boundary` Docker network is marked `internal: true`, and the `workspace`, `openrouter-proxy`, and `perplexity-mcp` services all share the `mitmproxy` network namespace. That means they do not get their own egress path at all. Outbound HTTP/HTTPS traffic is redirected with `iptables` inside the shared namespace before the process can bypass the proxy.
+In short: the agent should be able to work, but it should not be able to talk
+to arbitrary external services or receive broad Git credentials by default.
 
-The shared namespace is also configured as default-deny for outbound traffic. In practice that means:
+## What This Project Tries To Achieve
 
-- loopback traffic between `workspace`, `openrouter-proxy`, `perplexity-mcp`, and `mitmproxy` is allowed
-- DNS is only available through Docker's embedded loopback resolver rather than arbitrary port `53` egress
-- TCP `80` and `443` are the only non-local outbound ports permitted, and those client connections are transparently redirected into `mitmproxy`
-- all other outbound traffic is rejected
+This setup is meant for experimenting with agentic coding tools without giving
+them a normal unrestricted developer environment.
 
-The default allowlist permits:
+The intended security properties are:
 
-- `perplexity.ai`
-- `api.perplexity.ai`
-- `openrouter.ai`
-- `api.openrouter.ai`
+- the agent runs in a devcontainer, not directly on the host
+- most outbound traffic is forced through a shared `mitmproxy` boundary
+- outbound destinations are limited by a build-time allowlist
+- Git fetch/push is handled by a separate `git-broker` MCP service
+- the workspace does not receive raw Git push credentials
+- host secrets should stay outside the repository
+
+Important limit:
+
+- this is a containment-oriented developer sandbox, not a hardened VM boundary
+- if you intentionally grant broad privileges, the boundary weakens accordingly
+
+## Architecture
+
+The main runtime components are:
+
+- `workspace`: the Ubuntu devcontainer you open in VS Code / Dev Containers
+- `openrouter-proxy`: an OpenAI-compatible proxy that injects your OpenRouter key
+- `perplexity-mcp`: an HTTP MCP server backed by `@perplexity-ai/mcp-server`
+- `git-broker`: a narrow MCP service for Git fetch/push using a dedicated repo deploy key
+- `mitmproxy`: the only service with normal external egress
+- `.opencode/opencode.jsonc`: project-level OpenCode config that points OpenCode at the local proxy and MCP services
+
+### Service Topology
+
+```mermaid
+flowchart LR
+  Host[Host machine]
+  VSCode[VS Code / devcontainer CLI]
+  Workspace[workspace<br/>OpenCode runs here]
+  OpenRouter[openrouter-proxy<br/>OpenAI-compatible]
+  Perplexity[perplexity-mcp]
+  GitBroker[git-broker]
+  Mitm[mitmproxy]
+  Internet[Allowed external services]
+
+  Host --> VSCode
+  VSCode --> Workspace
+
+  Workspace -->|:4000/v1| OpenRouter
+  Workspace -->|:8081/mcp| Perplexity
+  Workspace -->|:8082/mcp| GitBroker
+
+  Workspace -. shares netns .-> Mitm
+  OpenRouter -. shares netns .-> Mitm
+  Perplexity -. shares netns .-> Mitm
+  GitBroker -. shares netns .-> Mitm
+
+  Mitm --> Internet
+```
+
+### Network Boundary
+
+The `ai_boundary` Docker network is marked `internal: true`. The `workspace`,
+`openrouter-proxy`, `perplexity-mcp`, and `git-broker` services all use
+`network_mode: "service:mitmproxy"`, so they share the `mitmproxy` network
+namespace instead of getting their own independent egress path.
+
+Inside that shared namespace:
+
+- loopback traffic between the local services is allowed
+- Docker DNS is allowed
+- TCP `80` and `443` are transparently redirected into `mitmproxy`
+- UDP `80` and `443` are rejected to block QUIC / HTTP/3
+- non-local outbound traffic is default-deny unless explicitly allowed
+- the `git-broker` gets a narrow direct SSH-over-443 exception for GitHub
+
+```mermaid
+flowchart TD
+  Proc[Process in workspace / helper service]
+  Rules[iptables in shared namespace]
+  Loopback[Loopback traffic]
+  Redirect[Transparent redirect to mitmproxy]
+  BrokerSSH[git-broker SSH over 443]
+  Block[Rejected]
+  Allowlist[mitmproxy allowlist]
+  Upstream[Allowed upstream hosts]
+
+  Proc --> Rules
+  Rules -->|127.0.0.1| Loopback
+  Rules -->|TCP 80/443| Redirect
+  Rules -->|git-broker uid| BrokerSSH
+  Rules -->|everything else| Block
+  Redirect --> Allowlist
+  Allowlist -->|allowed host| Upstream
+  Allowlist -->|blocked host| Block
+```
+
+### Git Credential Boundary
+
+Git access is intentionally separated from the main workspace.
+
+- the workspace does not get a PAT
+- the workspace does not get a deploy key
+- the broker reads host-managed deploy-key state
+- the broker mounts the dedicated private key read-only
+- the broker exposes MCP tools rather than raw credentials
+
+```mermaid
+flowchart LR
+  HostState[Host deploy-key state<br/>~/.local/state/opencode-sandbox]
+  HostKeys[Host private key<br/>~/.local/share/opencode-sandbox/keys]
+  Broker[git-broker]
+  Workspace[workspace]
+  GitHub[GitHub repo]
+
+  HostState --> Broker
+  HostKeys --> Broker
+  Workspace -->|MCP fetch / push| Broker
+  Broker -->|validated Git ops| GitHub
+  Workspace -. no raw Git creds .-> GitHub
+```
+
+### Allowed Hosts
+
+The outbound hostname policy is baked into the `mitmproxy` image from
+[allowed-hosts.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowed-hosts.yaml).
+
+- exact hostnames are matched with a set lookup
+- wildcard suffixes are supported with entries like `*.opencode.ai`
+- policy changes require rebuilding the `mitmproxy` image
+
+The default allowlist includes:
+
+- OpenRouter and Perplexity endpoints
 - `*.opencode.ai`
-- common package-manager and source hosts such as GitHub, npm, PyPI, Cargo, Go proxy, RubyGems, and Ubuntu/Debian mirrors
-
-The active policy source lives in [allowed-hosts.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowed-hosts.yaml). Exact hostnames are matched with a set lookup, and wildcard suffixes can be expressed as entries like `*.opencode.ai`.
+- GitHub endpoints needed for source fetches and metadata
+- common package-manager hosts such as npm, PyPI, Cargo, Go proxy, RubyGems, and Ubuntu/Debian mirrors
 
 ## Bring it up
 
@@ -122,6 +241,7 @@ runs on the host before the devcontainer starts and does exactly two things:
    - `workspace`
    - `openrouter-proxy`
    - `perplexity-mcp`
+   - `git-broker`
 
    still point at a dead `mitmproxy` network namespace from an older run.
 
@@ -195,22 +315,30 @@ That means:
 
 ## OpenCode server access
 
-When the devcontainer starts, `.devcontainer/start-opencode-server.sh` launches `opencode serve` using the project config in `.opencode/opencode.jsonc`.
+OpenCode is not started automatically anymore. Start it manually inside the
+devcontainer when you want it:
 
-The server listens on `0.0.0.0:4096` inside the shared namespace and is published to your host at:
+```sh
+opencode serve
+```
+
+The project config in `.opencode/opencode.jsonc` binds the server to
+`0.0.0.0:4096`, and that port is published to your host at:
 
 ```text
 http://localhost:4096
 ```
 
-That lets you attach from your local machine with an SDK or CLI client while the actual OpenCode process stays inside the devcontainer boundary.
+That lets you attach from your local machine with an SDK or CLI client while
+the actual OpenCode process stays inside the devcontainer boundary.
 
 All published service ports are bound to `127.0.0.1` on the host, so they are only reachable from the local machine rather than every host interface.
 
 ## Notes
 
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
-- The transparent proxy path now relies on the mitmproxy CA being trusted by the runtime containers. The devcontainer startup script imports that CA into the Ubuntu trust store, and the Node-based helper services use `NODE_EXTRA_CA_CERTS`.
+- The transparent proxy path relies on the helper services trusting the
+  mitmproxy CA via `NODE_EXTRA_CA_CERTS`.
 - The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
 - The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` only for installing the mitmproxy CA into the container trust store.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.

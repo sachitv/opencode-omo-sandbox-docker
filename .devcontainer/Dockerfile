@@ -26,23 +26,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # Copy Bun from the upstream image instead of installing it via a curl script.
 COPY --from=bun-runtime /usr/local/bin/bun /usr/local/bin/bun
-COPY .devcontainer/start-opencode-server.sh /usr/local/bin/start-opencode-server.sh
 
 # Disable implicit host SSH agent use inside the devcontainer. Any Git push
 # credentials should be mounted explicitly rather than inherited from VS Code.
 RUN ln -sf /usr/local/bin/bun /usr/local/bin/bunx && \
     mkdir -p /etc/ssh/ssh_config.d && \
     printf 'Host *\n  IdentityAgent none\n  ForwardAgent no\n' >/etc/ssh/ssh_config.d/99-no-agent.conf && \
-    chmod 0755 /usr/local/bin/start-opencode-server.sh && \
     # Dev Containers will reconcile the remote user's UID/GID with the host.
     if ! id -u "${USERNAME}" >/dev/null 2>&1; then \
       useradd --create-home --shell /bin/bash "${USERNAME}"; \
-    fi && \
-    # Only allow the CA trust-store updates needed by start-opencode-server.sh.
-    printf '%s\n' \
-      "${USERNAME} ALL=(root) NOPASSWD: /bin/cp /mitmproxy-certs/mitmproxy-ca-cert.pem /usr/local/share/ca-certificates/mitmproxy-ca-cert.crt" \
-      "${USERNAME} ALL=(root) NOPASSWD: /usr/sbin/update-ca-certificates" \
-      > "/etc/sudoers.d/${USERNAME}" && \
-    chmod 0440 "/etc/sudoers.d/${USERNAME}"
+    fi
 
 USER ${USERNAME}
