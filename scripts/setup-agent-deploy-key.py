@@ -107,10 +107,6 @@ def parse_args() -> argparse.Namespace:
         description="Create a dedicated deploy key for the current repository.",
     )
     parser.add_argument(
-        "--repo",
-        help="Repository to scope the deploy key to, in owner/name form. Defaults to the current checkout.",
-    )
-    parser.add_argument(
         "--title",
         help="Deploy key title. Defaults to a repo-specific generated title.",
     )
@@ -140,7 +136,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    repo = args.repo or current_repo()
+    repo = current_repo()
     if "/" not in repo:
         die("repository must be in owner/name format")
     owner, name = repo.split("/", 1)
