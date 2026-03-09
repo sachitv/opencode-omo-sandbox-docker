@@ -33,7 +33,7 @@ fi
 # starts compose with --no-recreate, which can leave stale containers pointing
 # at an old mitmproxy namespace after a rebuild. Only tear the project down when
 # one of those namespace-linked containers still references a missing container.
-for service in workspace openrouter-proxy perplexity-mcp; do
+for service in workspace openrouter-proxy perplexity-mcp git-broker; do
   # Ask Compose for the concrete container id of the service if it already
   # exists from a previous run. No id means there is nothing to inspect yet.
   container_id="$(docker compose ps -q "${service}" 2>/dev/null || true)"

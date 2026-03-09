@@ -48,11 +48,39 @@ def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def cleanup_existing(state_path: Path) -> None:
+def load_existing_state(state_path: Path) -> dict[str, object] | None:
     if not state_path.is_file():
+        return None
+
+    return json.loads(state_path.read_text(encoding="utf-8"))
+
+
+def state_is_usable(state_path: Path) -> bool:
+    state = load_existing_state(state_path)
+    if not state:
+        return False
+
+    repo = str(state.get("repo") or "")
+    key_id = state.get("deploy_key_id")
+    private_key = Path(str(state.get("private_key") or "")).expanduser()
+    public_key = Path(str(state.get("public_key") or "")).expanduser()
+
+    if not repo or not key_id or not private_key.is_file() or not public_key.is_file():
+        return False
+
+    try:
+        run("gh", "api", f"/repos/{repo}/keys/{key_id}")
+    except subprocess.CalledProcessError:
+        return False
+
+    return True
+
+
+def cleanup_existing(state_path: Path) -> None:
+    state = load_existing_state(state_path)
+    if not state:
         return
 
-    state = json.loads(state_path.read_text(encoding="utf-8"))
     repo = state.get("repo")
     key_id = state.get("deploy_key_id")
     private_key = state.get("private_key")
@@ -128,11 +156,16 @@ def main() -> None:
     key_path = key_dir / f"{owner}__{name}"
     if state_path.exists():
         if args.ensure:
-            print(f"Managed deploy key state already exists at {state_path}")
-            return
-        if not args.replace:
+            if state_is_usable(state_path):
+                print(f"Managed deploy key state already exists at {state_path}")
+                return
+
+            print(f"Managed deploy key state at {state_path} is stale; recreating it")
+            cleanup_existing(state_path)
+        elif not args.replace:
             die(f"state already exists at {state_path}; rerun with --replace to rotate it")
-        cleanup_existing(state_path)
+        else:
+            cleanup_existing(state_path)
 
     ensure_parent(state_path)
     ensure_parent(key_path)
