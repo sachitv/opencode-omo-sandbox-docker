@@ -99,5 +99,8 @@
       "enabled": true,
       "timeout": 15000
     }
-  }
+  },
+  "plugin": [
+    "oh-my-opencode@3.11.2"
+  ]
 }

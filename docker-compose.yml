@@ -29,6 +29,9 @@ services:
     volumes:
       # The workspace mount is the agent's working tree inside the devcontainer.
       - .:/workspaces/opencode-omo-sandbox-docker:cached
+      # Keep service implementations visible to the agent without allowing edits
+      # from inside the workspace container.
+      - ./services:/workspaces/opencode-omo-sandbox-docker/services:ro
       # If the host checkout contains a repo-root .env file, mask it inside the
       # workspace with the tracked .env.example so the agent never sees real
       # repo-local secrets through the main repo bind mount.
