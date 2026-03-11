@@ -1,12 +1,15 @@
 # Exact host matches.
 # Use this for stable API hosts and registries.
 exact:
-  - perplexity.ai
-  - api.perplexity.ai
   - openrouter.ai
-  - api.openrouter.ai
+  - opencode.ai
+
+  # For MCP Servers
+  - mcp.exa.ai
   - search.brave.com
-  - sachit.me
+  - mcp.grep.app
+  - mcp.context7.com
+  - api.perplexity.ai
 
   # GitHub and release assets
   - github.com
@@ -16,8 +19,15 @@ exact:
   - objects.githubusercontent.com
   - release-assets.githubusercontent.com
 
-  # npm
+  # JS package managers
   - registry.npmjs.org
+  - jsr.io
+  - esm.sh
+  - cdn.jsdelivr.net
+
+  # deno
+  - deno.land
+  - dl.deno.land
 
   # Python
   - pypi.org
@@ -39,11 +49,10 @@ exact:
   - archive.ubuntu.com
   - security.ubuntu.com
   - deb.debian.org
-  - google.com
 
 # Wildcard suffixes.
 # "*.example.com" matches "foo.example.com" but not bare "example.com".
 wildcards:
-  - "*.opencode.ai"
-  - "*.search.brave.com"
-  - "*.google.com"
+  # These are currently not used for security purposes, but you may want to add some in the future.
+  # - "*.opencode.ai"
+  # - "*.search.brave.com"
