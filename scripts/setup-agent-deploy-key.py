@@ -33,7 +33,9 @@ def run(*args: str, env: dict[str, str] | None = None) -> str:
 
 
 def current_repo() -> str:
-    return run("gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner")
+    return run(
+        "gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"
+    )
 
 
 def current_branch() -> str:
@@ -55,7 +57,7 @@ def load_existing_state(state_path: Path) -> dict[str, object] | None:
     return json.loads(state_path.read_text(encoding="utf-8"))
 
 
-def state_is_usable(state_path: Path) -> bool:
+def state_is_usable(state_path: Path, expected_branch: str | None = None) -> bool:
     state = load_existing_state(state_path)
     if not state:
         return False
@@ -66,6 +68,12 @@ def state_is_usable(state_path: Path) -> bool:
     public_key = Path(str(state.get("public_key") or "")).expanduser()
 
     if not repo or not key_id or not private_key.is_file() or not public_key.is_file():
+        return False
+
+    if (
+        expected_branch is not None
+        and str(state.get("branch") or "") != expected_branch
+    ):
         return False
 
     try:
@@ -130,6 +138,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Exit successfully if managed state already exists for this repository.",
     )
+    parser.add_argument(
+        "--replace-if-branch-changed",
+        action="store_true",
+        help="When used with --ensure, replace the deploy key if the recorded branch differs from the current branch.",
+    )
     return parser.parse_args()
 
 
@@ -152,14 +165,34 @@ def main() -> None:
     key_path = key_dir / f"{owner}__{name}"
     if state_path.exists():
         if args.ensure:
-            if state_is_usable(state_path):
+            if state_is_usable(
+                state_path,
+                expected_branch=branch if args.replace_if_branch_changed else None,
+            ):
                 print(f"Managed deploy key state already exists at {state_path}")
                 return
 
-            print(f"Managed deploy key state at {state_path} is stale; recreating it")
+            existing_state = load_existing_state(state_path)
+            recorded_branch = (
+                str(existing_state.get("branch") or "") if existing_state else ""
+            )
+            if (
+                args.replace_if_branch_changed
+                and recorded_branch
+                and recorded_branch != branch
+            ):
+                print(
+                    f"Branch changed from '{recorded_branch}' to '{branch}'; rotating deploy key"
+                )
+            else:
+                print(
+                    f"Managed deploy key state at {state_path} is stale; recreating it"
+                )
             cleanup_existing(state_path)
         elif not args.replace:
-            die(f"state already exists at {state_path}; rerun with --replace to rotate it")
+            die(
+                f"state already exists at {state_path}; rerun with --replace to rotate it"
+            )
         else:
             cleanup_existing(state_path)
 
@@ -210,7 +243,9 @@ def main() -> None:
         "public_key": str(key_path.with_suffix(".pub")),
         "created_at": int(time.time()),
     }
-    state_path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    state_path.write_text(
+        json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     print(f"Created deploy key {deploy_key_id} for {repo}")
     print(f"State file: {state_path}")
