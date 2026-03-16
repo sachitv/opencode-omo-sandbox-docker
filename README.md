@@ -63,9 +63,9 @@ flowchart LR
   OpenRouter[openrouter-proxy<br/>OpenAI-compatible]
   Perplexity[perplexity-mcp]
   Brave[brave-search-mcp]
-  CoreDNS[coredns]
   GitBroker[git-broker]
   Mitm[mitmproxy]
+  CoreDNS[coredns]
   Internet[Allowed external services]
 
   Host --> VSCode
@@ -80,10 +80,11 @@ flowchart LR
   OpenRouter -. shares netns .-> Mitm
   Perplexity -. shares netns .-> Mitm
   Brave -. shares netns .-> Mitm
-  CoreDNS -. shares netns .-> Mitm
   GitBroker -. shares netns .-> Mitm
 
-  Mitm --> Internet
+  Mitm -->|HTTP/S| Internet
+  Mitm -. DNS .-> CoreDNS
+  CoreDNS -->|allowed zones| Internet
 ```
 
 ### Network Boundary
