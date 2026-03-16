@@ -1,0 +1,116 @@
+# Allowlist format
+# ─────────────────────────────────────────────────────────────────────────────
+# Each key is a host pattern. The value controls which paths are allowed.
+#
+#   example.com:               # null value → all paths allowed
+#
+#   example.com:               # allow-list → only these path prefixes
+#     - /foo
+#     - /bar
+#
+#   example.com:               # deny-list → all paths except these prefixes
+#     - !/admin
+#     - !/internal
+#
+#   *.example.com:             # wildcard subdomain → matches foo.example.com, not example.com itself
+#
+#   "*":                    # global wildcard → allow all traffic (quote the * in YAML)
+#
+# Method prefixes (case-insensitive):
+#   GET  POST  PUT  PATCH  DELETE  HEAD  OPTIONS  CONNECT  TRACE
+#   Omit the method to allow any method on that path.
+#
+# Rules:
+#   - Positive paths (/foo) and negated paths (!/foo) cannot be mixed in one rule.
+#   - Path entries must start with / (or !/).
+#   - Duplicate patterns are a startup error.
+#   - Exact host + covering wildcard → warning (exact takes precedence).
+#   - Matching precedence: exact > wildcard subdomain (longest wins) > "*"
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Examples (all commented out)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Allow all paths on a host:
+#   github.com:
+#
+# Allow only specific path prefixes (allow-list mode):
+#   api.github.com:
+#     - /repos/
+#     - /user
+#
+# Allow specific methods on specific paths:
+#   exampleapi.com:
+#     - PUT /foo/bar/1   # only PUT to this exact path
+#     - GET /a/b         # only GET (query strings still work: /a/b?x=y)
+#     - /public/         # any method on /public/ subtree
+#
+# Allow a specific file (exact path, also allows query strings on that file):
+#   example.me:
+#     - /a/x.png         # matches /a/x.png and /a/x.png?v=2 but NOT /a/x.png.evil
+#     - GET /a/x.png     # same but restricted to GET only
+#
+# Allow a whole subtree:
+#   assets.example.me:
+#     - /static/         # matches /static/css/app.css, /static/js/app.js, etc.
+#
+# Deny-list mode — allow all paths/methods except listed ones:
+#   example.me:
+#     - !/admin          # blocks any method to /admin and /admin/*, allows everything else
+#     - !DELETE /data/   # blocks DELETE to /data/ subtree only
+#
+# Wildcard subdomain, all paths:
+#   "*.example.me":
+#
+# Allow everything (use with caution — makes all other rules redundant):
+#   "*":
+# ─────────────────────────────────────────────────────────────────────────────
+
+# MCP and API services
+openrouter.ai:
+opencode.ai:
+mcp.exa.ai:
+search.brave.com:
+mcp.grep.app:
+mcp.context7.com:
+api.perplexity.ai:
+
+# GitHub and release assets
+github.com:
+api.github.com:
+raw.githubusercontent.com:
+codeload.github.com:
+objects.githubusercontent.com:
+release-assets.githubusercontent.com:
+
+# JS package managers
+registry.npmjs.org:
+jsr.io:
+esm.sh:
+cdn.jsdelivr.net:
+
+# Deno
+deno.land:
+dl.deno.land:
+
+# Python
+pypi.org:
+files.pythonhosted.org:
+
+# Rust / Cargo
+crates.io:
+index.crates.io:
+static.crates.io:
+
+# Go
+proxy.golang.org:
+sum.golang.org:
+
+# Ruby
+rubygems.org:
+
+# Debian / Ubuntu package repositories
+archive.ubuntu.com:
+security.ubuntu.com:
+deb.debian.org:
