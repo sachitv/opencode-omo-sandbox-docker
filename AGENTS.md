@@ -51,7 +51,7 @@ That means they are expected to share `mitmproxy`'s network namespace.
 Consequences:
 
 - local service-to-service traffic happens on `127.0.0.1`
-- DNS traffic on port 53 is redirected to CoreDNS at `127.0.0.53:5353`
+- DNS traffic on port 53 is redirected to CoreDNS at `127.0.0.53:5353`; the `MITM_OUTPUT` chain is inserted at position 1 of `OUTPUT` so it runs before Docker's own embedded-resolver DNAT rules — if it were appended, Docker would intercept `127.0.0.11:53` traffic first and CoreDNS would be bypassed
 - TCP `80` and `443` are redirected through `mitmproxy`
 - UDP `80` and `443` are rejected to block QUIC / HTTP/3
 - outbound traffic is default-deny except for the explicit exceptions in
@@ -214,6 +214,7 @@ Rules:
 
 - do not store secrets in this repository
 - do not add `.env`-based workflows back into the docs or runtime model
+- do not attempt to install system packages with sudo — add packages to the `apt-get install` block in `.devcontainer/Dockerfile` and rebuild instead
 - do not widen the allowlist or firewall casually
 - do not bypass `git-broker` by putting credentials into the workspace
 - do not assume policy-file edits are live; many are baked into images
