@@ -8,6 +8,8 @@ services:
     depends_on:
       mitmproxy:
         condition: service_started
+      coredns:
+        condition: service_started
       openrouter-proxy:
         condition: service_started
       perplexity-mcp:
@@ -45,6 +47,8 @@ services:
     depends_on:
       mitmproxy:
         condition: service_started
+      coredns:
+        condition: service_started
     command:
       - sh
       - -lc
@@ -68,6 +72,8 @@ services:
       context: ./services/perplexity-mcp
     depends_on:
       mitmproxy:
+        condition: service_started
+      coredns:
         condition: service_started
     command:
       - sh
@@ -94,6 +100,8 @@ services:
     depends_on:
       mitmproxy:
         condition: service_started
+      coredns:
+        condition: service_started
     environment:
       HOST: 0.0.0.0
       PORT: 8082
@@ -115,6 +123,8 @@ services:
     depends_on:
       mitmproxy:
         condition: service_started
+      coredns:
+        condition: service_started
     environment:
       BRAVE_API_KEY: ${BRAVE_API_KEY}
       BRAVE_MCP_TRANSPORT: http
@@ -127,11 +137,23 @@ services:
       # requests through the shared transparent proxy path.
       - mitmproxy_certs:/mitmproxy-certs:ro
 
+  coredns:
+    build:
+      context: .
+      dockerfile: infra/coredns/Dockerfile
+    depends_on:
+      mitmproxy:
+        condition: service_started
+    network_mode: "service:mitmproxy"
+    user: "${COREDNS_UID:-10002}"
+    read_only: true
+
   mitmproxy:
     build:
       context: ./infra/mitmproxy
     environment:
       MITMPROXY_LISTEN_PORT: 8080
+      COREDNS_UID: ${COREDNS_UID:-10002}
     ports:
       - "127.0.0.1:4096:4096"
       - "127.0.0.1:4000:4000"

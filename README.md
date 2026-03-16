@@ -28,6 +28,13 @@ The intended security properties are:
 - the workspace does not receive raw Git push credentials
 - host secrets should stay outside the repository
 
+Threat model focus for this sandbox:
+
+- an adversarial model may try to exfiltrate data through non-HTTP channels
+- DNS is a high-risk covert channel because small queries are easy to generate
+- HTTP allowlists alone do not constrain DNS resolver behavior
+- the boundary should be default-deny for both HTTP and DNS
+
 Important limit:
 
 - this is a containment-oriented developer sandbox, not a hardened VM boundary
@@ -41,6 +48,7 @@ The main runtime components are:
 - `openrouter-proxy`: an OpenAI-compatible proxy that injects your OpenRouter key
 - `perplexity-mcp`: an HTTP MCP server backed by `@perplexity-ai/mcp-server`
 - `brave-search-mcp`: an HTTP MCP server backed by the official Brave Search MCP image
+- `coredns`: a DNS allowlist resolver for shared-namespace DNS traffic
 - `git-broker`: a narrow MCP service for Git fetch/push using a dedicated repo deploy key
 - `mitmproxy`: the only service with normal external egress
 - `.opencode/opencode.jsonc`: project-level OpenCode config that points OpenCode at the local proxy and MCP services
@@ -55,6 +63,7 @@ flowchart LR
   OpenRouter[openrouter-proxy<br/>OpenAI-compatible]
   Perplexity[perplexity-mcp]
   Brave[brave-search-mcp]
+  CoreDNS[coredns]
   GitBroker[git-broker]
   Mitm[mitmproxy]
   Internet[Allowed external services]
@@ -71,6 +80,7 @@ flowchart LR
   OpenRouter -. shares netns .-> Mitm
   Perplexity -. shares netns .-> Mitm
   Brave -. shares netns .-> Mitm
+  CoreDNS -. shares netns .-> Mitm
   GitBroker -. shares netns .-> Mitm
 
   Mitm --> Internet
@@ -79,34 +89,78 @@ flowchart LR
 ### Network Boundary
 
 The `ai_boundary` Docker network is marked `internal: true`. The `workspace`,
-`openrouter-proxy`, `perplexity-mcp`, `brave-search-mcp`, and `git-broker` services all use
+`openrouter-proxy`, `perplexity-mcp`, `brave-search-mcp`, `coredns`, and `git-broker` services all use
 `network_mode: "service:mitmproxy"`, so they share the `mitmproxy` network
 namespace instead of getting their own independent egress path.
 
 Inside that shared namespace:
 
 - loopback traffic between the local services is allowed
-- Docker DNS is allowed
+- UDP/TCP port 53 is transparently redirected to CoreDNS on `127.0.0.53:5353` (`127.0.0.53` is a conventional local resolver address and avoids conflicts with Docker DNS on `127.0.0.11`)
+- all non-CoreDNS port-53 traffic is redirected by NAT DNAT before it reaches Docker DNS at `127.0.0.11:53`; CoreDNS itself is exempt from that DNAT by UID, making it the only process that can reach Docker DNS directly
 - TCP `80` and `443` are transparently redirected into `mitmproxy`
 - UDP `80` and `443` are rejected to block QUIC / HTTP/3
+- TCP/UDP `53` to non-loopback destinations is explicitly rejected
+- TCP `853`, UDP `5353`, and TCP `8853` are explicitly rejected
+- all IPv6 output is rejected; IPv6 is not used and the Docker networks have no IPv6 configured
 - non-local outbound traffic is default-deny unless explicitly allowed
 - the `git-broker` gets a narrow direct SSH-over-443 exception for GitHub
+
+### Why DNS Controls Exist
+
+Before CoreDNS, DNS lookups in the shared namespace could go to Docker's
+embedded resolver and then to upstream DNS for arbitrary domains. That creates
+an exfiltration path that bypasses the HTTP allowlist because DNS is not HTTP.
+
+Examples of what this protects against:
+
+- subdomain-encoded exfiltration (`chunk.attacker.tld` style queries)
+- high-volume DNS tunneling attempts over UDP/TCP port 53
+- encrypted-DNS bypass attempts over DoT-style ports
+
+Design intent:
+
+- HTTP traffic is policy-enforced by `mitmproxy` + `allowlist.py`
+- DNS traffic is policy-enforced by CoreDNS generated from the same
+  `infra/mitmproxy/allow-list.yaml` source of truth
+- both controls are baked into images, so policy changes require rebuild/recreate
+
+Important limits:
+
+- this does not make the sandbox VM-grade isolation
+- if a future HTTP allowlist change permits DoH resolver endpoints on 443,
+  DNS-over-HTTPS can still become an application-layer exfil path
+- allowlisted domains can still receive DNS queries for their own zones
+- the current CoreDNS generation is zone-based rather than exact-host-based:
+  an HTTP allowlist entry such as `github.com` permits DNS lookups for names
+  under the `github.com` zone, and a wildcard HTTP entry such as
+  `*.example.com` also permits the apex `example.com` unless policy generation
+  is tightened further
 
 ```mermaid
 flowchart TD
   Proc[Process in workspace / helper service]
   Rules[iptables in shared namespace]
-  Loopback[Loopback traffic]
-  Redirect[Transparent redirect to mitmproxy]
+  DNSRedirect[DNAT UDP/TCP 53 to 127.0.0.53:5353]
+  CoreDNS[CoreDNS allowlist resolver]
+  DockerDNS[Docker DNS 127.0.0.11:53]
+  DNSAllow[Allowed DNS zone]
+  DNSRefuse[REFUSED by CoreDNS]
+  Redirect[Transparent redirect to mitmproxy for TCP 80/443]
   BrokerSSH[git-broker SSH over 443]
   Block[Rejected]
   Allowlist[mitmproxy allowlist]
   Upstream[Allowed upstream hosts]
 
   Proc --> Rules
-  Rules -->|127.0.0.1| Loopback
+  Rules -->|UDP/TCP 53| DNSRedirect
+  DNSRedirect --> CoreDNS
+  CoreDNS -->|allowlisted zone| DockerDNS
+  CoreDNS -->|non-allowlisted zone| DNSRefuse
+  DockerDNS --> DNSAllow
   Rules -->|TCP 80/443| Redirect
   Rules -->|git-broker uid| BrokerSSH
+  Rules -->|53 non-loopback, 853, 5353, 8853| Block
   Rules -->|everything else| Block
   Redirect --> Allowlist
   Allowlist -->|allowed host| Upstream
@@ -361,6 +415,8 @@ runs on the host before the devcontainer starts and does exactly two things:
    - `workspace`
    - `openrouter-proxy`
    - `perplexity-mcp`
+   - `brave-search-mcp`
+   - `coredns`
    - `git-broker`
 
    still point at a dead `mitmproxy` network namespace from an older run.
@@ -458,6 +514,14 @@ All published service ports are bound to `127.0.0.1` on the host, so they are on
 
 ## Notes
 
+- CoreDNS policy is generated at build time by
+  [generate-corefile.py](infra/coredns/generate-corefile.py) from
+  [allow-list.yaml](infra/mitmproxy/allow-list.yaml), then baked into the
+  CoreDNS image by [infra/coredns/Dockerfile](infra/coredns/Dockerfile).
+- DNS and HTTP policy now share the same source of truth (`allow-list.yaml`),
+  which reduces drift between resolver policy and `mitmproxy` host policy.
+- For deeper DNS threat-model details and alternatives, see
+  [docs/design-dns-filtering-coredns.md](docs/design-dns-filtering-coredns.md).
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
 - The transparent proxy path relies on the helper services trusting the
   mitmproxy CA via `NODE_EXTRA_CA_CERTS`.
