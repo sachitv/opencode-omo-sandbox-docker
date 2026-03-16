@@ -528,7 +528,7 @@ All published service ports are bound to `127.0.0.1` on the host, so they are on
 - The transparent proxy path relies on the helper services trusting the
   mitmproxy CA via `NODE_EXTRA_CA_CERTS`.
 - The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
-- The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` for: installing the mitmproxy CA into the container trust store, and running `apt`/`apt-get` to install packages. Network tools (`iptables`, `ip`, etc.) are intentionally excluded to prevent bypassing the mitmproxy/CoreDNS controls.
+- The devcontainer runs as a non-root `agent` user with passwordless `sudo` scoped to a single operation: installing the mitmproxy CA into the container trust store. No package manager is in sudoers — granting `sudo apt-get` is a known privilege-escalation path via APT's `-o` hook flags. If the agent needs additional system packages, add them to the `apt-get install` block in `.devcontainer/Dockerfile` and rebuild.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.
 - The MITM policy logic lives in [allowlist.py](infra/mitmproxy/allowlist.py), and the editable traffic policy lives in [allow-list.yaml](infra/mitmproxy/allow-list.yaml).
 - Both policy files are copied into the `mitmproxy` image at build time rather than mounted at runtime.
