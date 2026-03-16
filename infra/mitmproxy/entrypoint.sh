@@ -74,7 +74,8 @@ iptables -A MITM_FILTER_OUT -j REJECT
 # Block all IPv6 output as a blanket measure so that environmental drift
 # (e.g. a Docker daemon with IPv6 enabled) cannot create an unfiltered egress
 # path that bypasses the IPv4 rules above.
-ip6tables -A OUTPUT -j REJECT
+ip6tables -C OUTPUT -j REJECT 2>/dev/null || \
+  ip6tables -A OUTPUT -j REJECT
 
 exec su -s /bin/bash -c \
   "mitmdump --mode transparent --showhost --listen-host 0.0.0.0 --listen-port ${PORT} -s /opt/mitmproxy/allowlist.py" \
