@@ -214,7 +214,7 @@ Rules:
 
 - do not store secrets in this repository
 - do not add `.env`-based workflows back into the docs or runtime model
-- do not attempt to install system packages with sudo — there is no package manager in sudoers; add packages to the `apt-get install` block in `.devcontainer/Dockerfile` and rebuild instead
+- do not attempt to install system packages with sudo — add packages to the `apt-get install` block in `.devcontainer/Dockerfile` and rebuild instead
 - do not widen the allowlist or firewall casually
 - do not bypass `git-broker` by putting credentials into the workspace
 - do not assume policy-file edits are live; many are baked into images
