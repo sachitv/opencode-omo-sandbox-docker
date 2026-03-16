@@ -10,6 +10,7 @@
   "workspaceFolder": "/workspaces/opencode-omo-sandbox-docker",
   "runServices": [
     "mitmproxy",
+    "coredns",
     "openrouter-proxy",
     "perplexity-mcp",
     "workspace"

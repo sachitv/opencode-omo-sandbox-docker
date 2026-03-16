@@ -24,6 +24,7 @@ The important services are:
   normal external egress
 - `openrouter-proxy`: local OpenAI-compatible proxy for OpenRouter
 - `perplexity-mcp`: local HTTP MCP server for Perplexity
+- `coredns`: local DNS allowlist resolver for shared-namespace DNS
 - `git-broker`: local HTTP MCP service for Git fetch/push using a dedicated
   repo deploy key
 
@@ -41,7 +42,7 @@ Important:
 
 ## Network Model
 
-`workspace`, `openrouter-proxy`, `perplexity-mcp`, and `git-broker` use:
+`workspace`, `openrouter-proxy`, `perplexity-mcp`, `coredns`, and `git-broker` use:
 
 - `network_mode: "service:mitmproxy"`
 
@@ -50,6 +51,7 @@ That means they are expected to share `mitmproxy`'s network namespace.
 Consequences:
 
 - local service-to-service traffic happens on `127.0.0.1`
+- DNS traffic on port 53 is redirected to CoreDNS at `127.0.0.53:5353`
 - TCP `80` and `443` are redirected through `mitmproxy`
 - UDP `80` and `443` are rejected to block QUIC / HTTP/3
 - outbound traffic is default-deny except for the explicit exceptions in
@@ -101,6 +103,10 @@ When changing behavior, start here:
   OpenCode server port, model config, MCP endpoints
 - `infra/mitmproxy/entrypoint.sh`
   iptables / egress enforcement
+- `infra/coredns/Dockerfile`
+  CoreDNS image build and generated Corefile packaging
+- `infra/coredns/generate-corefile.py`
+  build-time generation of CoreDNS allowlist zones from `allow-list.yaml`
 - `infra/mitmproxy/allowlist.py`
   allowlist matching logic (host, path, method, normalisation)
 - `infra/mitmproxy/allow-list.yaml`
@@ -222,6 +228,7 @@ Use these when changing behavior:
 - `docker compose build git-broker`
 - `docker run --rm opencode-omo-sandbox-docker-git-broker:latest bun test`
 - `cd infra/mitmproxy && uv run pytest test_allowlist.py -v` — allowlist policy logic and security tests
+- `cd infra/coredns && uv run pytest test_generate_corefile.py -v` — Corefile generator logic and coverage
 
 When debugging runtime issues, distinguish these paths:
 
