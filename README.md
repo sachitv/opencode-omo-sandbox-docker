@@ -98,6 +98,7 @@ Inside that shared namespace:
 
 - loopback traffic between the local services is allowed
 - UDP/TCP port 53 is transparently redirected to CoreDNS on `127.0.0.53:5353` (`127.0.0.53` is a conventional local resolver address and avoids conflicts with Docker DNS on `127.0.0.11`)
+- the `MITM_OUTPUT` chain is inserted at position 1 of the `OUTPUT` nat chain so it runs before Docker's own embedded-resolver DNAT rules (which redirect `127.0.0.11:53` traffic to Docker's internal resolver port); if appended instead, Docker intercepts DNS first and CoreDNS is bypassed entirely
 - all non-CoreDNS port-53 traffic is redirected by NAT DNAT before it reaches Docker DNS at `127.0.0.11:53`; CoreDNS itself is exempt from that DNAT by UID, making it the only process that can reach Docker DNS directly
 - TCP `80` and `443` are transparently redirected into `mitmproxy`
 - UDP `80` and `443` are rejected to block QUIC / HTTP/3
@@ -225,7 +226,7 @@ The default allowlist includes:
 
 - OpenRouter, Perplexity, Exa, Brave Search, Context7, and Grep App MCP endpoints
 - GitHub endpoints needed for source fetches and metadata
-- common package-manager hosts: npm, JSR, Deno, PyPI, Cargo, Go proxy, RubyGems, and Ubuntu/Debian mirrors
+- common package-manager hosts: npm, JSR, Deno, PyPI, Cargo, Go proxy, RubyGems, and Ubuntu/Debian mirrors (`archive.ubuntu.com`, `security.ubuntu.com`, `ports.ubuntu.com`, `deb.debian.org`)
 
 ## Bring it up
 
@@ -527,9 +528,10 @@ All published service ports are bound to `127.0.0.1` on the host, so they are on
 - The transparent proxy path relies on the helper services trusting the
   mitmproxy CA via `NODE_EXTRA_CA_CERTS`.
 - The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
-- The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` only for installing the mitmproxy CA into the container trust store.
+- The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` for: installing the mitmproxy CA into the container trust store, and running `apt`/`apt-get` to install packages. Network tools (`iptables`, `ip`, etc.) are intentionally excluded to prevent bypassing the mitmproxy/CoreDNS controls.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.
 - The MITM policy logic lives in [allowlist.py](infra/mitmproxy/allowlist.py), and the editable traffic policy lives in [allow-list.yaml](infra/mitmproxy/allow-list.yaml).
 - Both policy files are copied into the `mitmproxy` image at build time rather than mounted at runtime.
 - Editing the policy files in the repo does not affect an already-built or already-running proxy. Rebuild the `mitmproxy` image and recreate the container for policy changes to take effect.
 - The MITM base image is pinned to a specific `mitmproxy` release rather than `latest` so rebuilds stay predictable.
+- The `MITM_OUTPUT` nat chain is inserted at position 1 of `OUTPUT` (not appended) so it precedes Docker's embedded-resolver DNAT rules. Appending instead allows Docker to intercept `127.0.0.11:53` traffic before the custom rules fire, bypassing CoreDNS entirely.

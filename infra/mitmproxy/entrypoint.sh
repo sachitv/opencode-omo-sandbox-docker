@@ -11,10 +11,13 @@ COREDNS_UID="${COREDNS_UID:-10002}"
 # the client process can connect directly to external port 80/443.
 iptables -t nat -N MITM_OUTPUT 2>/dev/null || true
 iptables -t nat -F MITM_OUTPUT
-iptables -t nat -C OUTPUT -p tcp -j MITM_OUTPUT 2>/dev/null || \
-  iptables -t nat -A OUTPUT -p tcp -j MITM_OUTPUT
-iptables -t nat -C OUTPUT -p udp -j MITM_OUTPUT 2>/dev/null || \
-  iptables -t nat -A OUTPUT -p udp -j MITM_OUTPUT
+# Insert at position 1 so MITM_OUTPUT precedes Docker's embedded-DNS DNAT rules
+# (which Docker adds before the container entrypoint runs). If we append instead,
+# Docker intercepts 127.0.0.11:53 traffic first and CoreDNS is bypassed entirely.
+iptables -t nat -D OUTPUT -p tcp -j MITM_OUTPUT 2>/dev/null || true
+iptables -t nat -D OUTPUT -p udp -j MITM_OUTPUT 2>/dev/null || true
+iptables -t nat -I OUTPUT 1 -p tcp -j MITM_OUTPUT
+iptables -t nat -I OUTPUT 1 -p udp -j MITM_OUTPUT
 
 iptables -t nat -A MITM_OUTPUT -m owner --uid-owner "${MITM_UID}" -j RETURN
 iptables -t nat -A MITM_OUTPUT -m owner --uid-owner "${COREDNS_UID}" -j RETURN

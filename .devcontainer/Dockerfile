@@ -35,6 +35,14 @@ RUN ln -sf /usr/local/bin/bun /usr/local/bin/bunx && \
     # Dev Containers will reconcile the remote user's UID/GID with the host.
     if ! id -u "${USERNAME}" >/dev/null 2>&1; then \
       useradd --create-home --shell /bin/bash "${USERNAME}"; \
-    fi
+    fi && \
+    # Grant the agent passwordless sudo for specific operations only:
+    #   - mitmproxy CA cert installation (required at container start)
+    #   - apt/apt-get package installation (so the agent can install dependencies)
+    # Intentionally excludes pip, iptables, ip, and other tools that could
+    # bypass the mitmproxy/CoreDNS network controls.
+    echo "${USERNAME} ALL=(root) NOPASSWD: /bin/cp /mitmproxy-certs/mitmproxy-ca-cert.pem /usr/local/share/ca-certificates/mitmproxy-ca.crt, /usr/sbin/update-ca-certificates, /usr/bin/apt-get, /usr/bin/apt" \
+        > /etc/sudoers.d/${USERNAME} && \
+    chmod 0440 /etc/sudoers.d/${USERNAME}
 
 USER ${USERNAME}
