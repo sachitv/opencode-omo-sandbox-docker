@@ -17,7 +17,7 @@ RUN apt-get update && \
 # Keep the policy and firewall scripts in normal source files so the image
 # build stays declarative and the runtime behavior is easy to audit.
 COPY allowlist.py /opt/mitmproxy/allowlist.py
-COPY allowed-hosts.yaml /opt/mitmproxy/allowed-hosts.yaml
+COPY allow-list.yaml /opt/mitmproxy/allow-list.yaml
 COPY entrypoint.sh /opt/mitmproxy/entrypoint.sh
 
 RUN chmod +x /opt/mitmproxy/entrypoint.sh

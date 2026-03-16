@@ -102,9 +102,9 @@ When changing behavior, start here:
 - `infra/mitmproxy/entrypoint.sh`
   iptables / egress enforcement
 - `infra/mitmproxy/allowlist.py`
-  hostname allowlist logic
-- `infra/mitmproxy/allowed-hosts.yaml`
-  editable allowlist policy source
+  allowlist matching logic (host, path, method, normalisation)
+- `infra/mitmproxy/allow-list.yaml`
+  editable traffic policy — hosts, path allow/deny lists, method restrictions
 - `services/openrouter-proxy/server.js`
   OpenRouter-compatible proxy
 - `services/perplexity-mcp/http-wrapper.mjs`
@@ -117,7 +117,7 @@ When changing behavior, start here:
 These files are baked into the `mitmproxy` image at build time:
 
 - `infra/mitmproxy/allowlist.py`
-- `infra/mitmproxy/allowed-hosts.yaml`
+- `infra/mitmproxy/allow-list.yaml`
 - `infra/mitmproxy/entrypoint.sh`
 
 So:
@@ -221,6 +221,7 @@ Use these when changing behavior:
 - `python3 -m py_compile scripts/*.py`
 - `docker compose build git-broker`
 - `docker run --rm opencode-omo-sandbox-docker-git-broker:latest bun test`
+- `cd infra/mitmproxy && uv run pytest test_allowlist.py -v` — allowlist policy logic and security tests
 
 When debugging runtime issues, distinguish these paths:
 
