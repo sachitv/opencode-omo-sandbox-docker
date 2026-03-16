@@ -301,7 +301,7 @@ def _load_policy() -> list[HostRule]:
     if raw is None:
         return []
     if not isinstance(raw, dict):
-        raise ValueError("allowed-hosts.yaml must be a YAML mapping at the top level")
+        raise ValueError("allow-list.yaml must be a YAML mapping at the top level")
 
     rules: list[HostRule] = []
     seen: set[str] = set()
@@ -317,7 +317,7 @@ def _load_policy() -> list[HostRule]:
             raise ValueError(
                 f"Host pattern must be a string, got {type(key).__name__}: {key!r}. "
                 f"If the hostname looks like a YAML keyword (true, false, null, ~), "
-                f"quote it: '\"{key}\".example.com:'"
+                f"quote it in YAML: '\"{key}\":'"
             )
         pattern = key.strip().lower()
 

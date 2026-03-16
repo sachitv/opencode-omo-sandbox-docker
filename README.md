@@ -141,7 +141,7 @@ flowchart LR
 ### Allowed Hosts
 
 The outbound traffic policy is baked into the `mitmproxy` image from
-[allow-list.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allow-list.yaml).
+[allow-list.yaml](infra/mitmproxy/allow-list.yaml).
 
 Each entry is a YAML mapping key (the host pattern) with an optional path list as the value:
 
@@ -179,7 +179,7 @@ recommended if you want the agent sandbox to avoid seeing them. Credentials
 stored in repo files weaken the boundary and are easy to handle incorrectly.
 
 This repo includes a tracked
-[.env.example](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/.env.example)
+[.env.example](.env.example)
 with empty values, and the workspace always mounts that file at the repo-root
 `.env` path inside the container. That means a real host-side repo-root `.env`
 is masked inside the workspace by default.
@@ -219,7 +219,7 @@ Use `Dev Containers: Rebuild and Reopen in Container` from VS Code to restart it
 ## MCP Configuration
 
 The project-level MCP configuration lives in
-[.opencode/opencode.jsonc](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/.opencode/opencode.jsonc).
+[.opencode/opencode.jsonc](.opencode/opencode.jsonc).
 
 Right now it includes:
 
@@ -296,7 +296,7 @@ Recommendation:
 - treat Docker-backed local MCPs as opt-in and higher risk
 
 When adding a new MCP server that makes outbound network calls, also update
-[allow-list.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allow-list.yaml)
+[allow-list.yaml](infra/mitmproxy/allow-list.yaml)
 with the upstream hosts it needs.
 
 Otherwise the container may start successfully but all real requests will still
@@ -313,9 +313,9 @@ the `workspace` container.
 
 The host-side setup helpers are:
 
-- [setup-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/setup-agent-deploy-key.py)
-- [revoke-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/revoke-agent-deploy-key.py)
-- [devcontainer-initialize-host.sh](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/devcontainer-initialize-host.sh)
+- [setup-agent-deploy-key.py](scripts/setup-agent-deploy-key.py)
+- [revoke-agent-deploy-key.py](scripts/revoke-agent-deploy-key.py)
+- [devcontainer-initialize-host.sh](scripts/devcontainer-initialize-host.sh)
 
 `setup-agent-deploy-key.py` will:
 
@@ -348,10 +348,10 @@ So the first `devcontainer up` on a new host checkout now assumes:
 ### What The Host Init Script Does
 
 If the shell script is hard to read, the behavior is simpler than it looks.
-[devcontainer-initialize-host.sh](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/devcontainer-initialize-host.sh)
+[devcontainer-initialize-host.sh](scripts/devcontainer-initialize-host.sh)
 runs on the host before the devcontainer starts and does exactly two things:
 
-1. It runs [setup-agent-deploy-key.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/scripts/setup-agent-deploy-key.py)
+1. It runs [setup-agent-deploy-key.py](scripts/setup-agent-deploy-key.py)
    with `--ensure`.
    That means:
    - if a managed deploy key already exists for this repository, leave it alone
@@ -374,13 +374,13 @@ error.
 The script also fingerprints the files that affect the devcontainer images and
 service images, including:
 
-- [docker-compose.yml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/docker-compose.yml)
-- [.devcontainer](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/.devcontainer)
-- [infra](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra)
-- [services](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/services)
+- [docker-compose.yml](docker-compose.yml)
+- [.devcontainer](.devcontainer)
+- [infra](infra)
+- [services](services)
 
 If any of those files change, such as
-[allow-list.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allow-list.yaml),
+[allow-list.yaml](infra/mitmproxy/allow-list.yaml),
 the script forces a Compose teardown before the next startup so the changed
 image build inputs are not masked by container reuse.
 
@@ -464,7 +464,7 @@ All published service ports are bound to `127.0.0.1` on the host, so they are on
 - The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
 - The devcontainer runs as a non-root `agent` user with tightly scoped passwordless `sudo` only for installing the mitmproxy CA into the container trust store.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.
-- The MITM policy logic lives in [allowlist.py](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allowlist.py), and the editable traffic policy lives in [allow-list.yaml](/Users/sachitvithaldas/Development/opencode-omo-sandbox-docker/infra/mitmproxy/allow-list.yaml).
+- The MITM policy logic lives in [allowlist.py](infra/mitmproxy/allowlist.py), and the editable traffic policy lives in [allow-list.yaml](infra/mitmproxy/allow-list.yaml).
 - Both policy files are copied into the `mitmproxy` image at build time rather than mounted at runtime.
 - Editing the policy files in the repo does not affect an already-built or already-running proxy. Rebuild the `mitmproxy` image and recreate the container for policy changes to take effect.
 - The MITM base image is pinned to a specific `mitmproxy` release rather than `latest` so rebuilds stay predictable.

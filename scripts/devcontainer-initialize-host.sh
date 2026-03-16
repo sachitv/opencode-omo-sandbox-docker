@@ -15,9 +15,9 @@ cd "${REPO_ROOT}"
 # Ensure the dedicated repo-scoped deploy key exists and is valid for the
 # currently checked-out branch. `--ensure` creates the key on first run and
 # becomes a no-op if the state is still usable for the current branch.
-# `--replace` is used instead when the recorded branch differs from the
-# current HEAD branch so the old deploy key is revoked and a fresh one is
-# created that reflects the new branch.
+# `--replace-if-branch-changed` triggers automatic rotation when the recorded
+# branch differs from the current HEAD branch — the old deploy key is revoked
+# and a fresh one is created that reflects the new branch.
 python3 scripts/setup-agent-deploy-key.py --ensure --replace-if-branch-changed
 
 # If the build inputs changed since the last devcontainer startup, tear the
