@@ -6,6 +6,24 @@ import argparse
 from pathlib import Path
 
 import yaml
+from yaml import SafeLoader
+
+
+def _negation_entry_constructor(
+    loader: SafeLoader, suffix: str, node: yaml.ScalarNode
+) -> str:
+    # Mirror the same constructor used in infra/mitmproxy/allowlist.py so that
+    # deny-list entries like "!/admin" and "!DELETE /data/" are treated as plain
+    # strings rather than unknown YAML tags (which safe_load would reject).
+    scalar = loader.construct_scalar(node)
+    return "!" + suffix + (" " + scalar if scalar else "")
+
+
+class _PolicyLoader(SafeLoader):
+    pass
+
+
+_PolicyLoader.add_multi_constructor("!", _negation_entry_constructor)
 
 
 def parse_args() -> argparse.Namespace:
@@ -25,7 +43,7 @@ def normalize_zone(host_pattern: str) -> str:
 
 
 def load_zones(policy_path: Path) -> list[str]:
-    raw = yaml.safe_load(policy_path.read_text(encoding="utf-8"))
+    raw = yaml.load(policy_path.read_text(encoding="utf-8"), Loader=_PolicyLoader)
     if raw is None:
         return []
     if not isinstance(raw, dict):

@@ -121,6 +121,20 @@ class TestLoadZones:
         f = _yaml_file(tmp_path, '"*.example.com":\nexample.com:\n')
         assert load_zones(f) == ["example.com"]
 
+    def test_deny_list_entries_do_not_raise(self, tmp_path):
+        # "!/admin" and "!DELETE /data/" are valid deny-list path entries in
+        # allow-list.yaml. safe_load treats "!" as a YAML tag and raises
+        # ConstructorError; the custom _PolicyLoader must handle them as plain
+        # strings so Corefile generation does not break when a host has a
+        # deny-list rule.
+        f = _yaml_file(tmp_path, "example.com:\n  - !/admin\n  - !DELETE /data/\n")
+        assert load_zones(f) == ["example.com"]
+
+    def test_deny_list_entry_with_empty_scalar(self, tmp_path):
+        # "!/admin" parses as tag "!/" + suffix "admin" + empty scalar.
+        f = _yaml_file(tmp_path, "example.com:\n  - !/admin\n")
+        assert load_zones(f) == ["example.com"]
+
     def test_host_value_coerced_to_string(self, tmp_path):
         # YAML integer keys are str()-coerced before normalisation.
         f = _yaml_file(tmp_path, "123:\n")
