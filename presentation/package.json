@@ -1,0 +1,12 @@
+{
+  "name": "presentation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch server.ts",
+    "start": "bun server.ts"
+  },
+  "dependencies": {
+    "reveal.js": "^5.1.0"
+  }
+}
