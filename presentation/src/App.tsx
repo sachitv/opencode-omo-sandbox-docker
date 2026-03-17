@@ -17,6 +17,8 @@ import Slide11TrustProblem from './slides/11-trust-problem'
 import Slide12DesignGoal from './slides/12-design-goal'
 import Slide13SandboxSection from './slides/13-sandbox-section'
 import Slide14ArchitectureOverview from './slides/14-architecture-overview'
+import Slide14aDnsQueryFlow from './slides/14a-dns-query-flow'
+import Slide14bHttpInterceptionFlow from './slides/14b-http-interception-flow'
 import Slide15SharedNetworkNamespace from './slides/15-shared-network-namespace'
 import Slide16MitmproxyAllowlist from './slides/16-mitmproxy-allowlist'
 import Slide17DnsExfiltration from './slides/17-dns-exfiltration'
@@ -90,6 +92,16 @@ const speakerNotes: Record<number, string[]> = {
     "The key insight: all services share the mitmproxy network namespace",
     "Local service traffic stays on loopback while all outbound traffic funnels through a single policy point",
     "mitmproxy is the only container with real external egress",
+  ],
+  141: [
+    "Use this to show the DNS path as enforcement, not just theory",
+    "Every DNS query begins in the workspace, but port 53 is redirected into CoreDNS before it can go anywhere else",
+    "Allowed names resolve upstream, disallowed names are refused inside the boundary",
+  ],
+  142: [
+    "HTTP follows the same architectural pattern but with a different interception point",
+    "The key difference is that TCP 80 and 443 are redirected into mitmproxy, where host, path, and method policy are enforced",
+    "Allowed requests continue upstream, blocked requests die at the proxy",
   ],
   15: [
     "This is the core architectural move: sharing the network namespace gives you a single choke point without needing sidecar injection or complex routing",
@@ -187,6 +199,12 @@ export default function App() {
       </Slide>
       <Slide notes={speakerNotes[14].join('\n\n')}>
         <Slide14ArchitectureOverview />
+      </Slide>
+      <Slide notes={speakerNotes[141].join('\n\n')}>
+        <Slide14aDnsQueryFlow />
+      </Slide>
+      <Slide notes={speakerNotes[142].join('\n\n')}>
+        <Slide14bHttpInterceptionFlow />
       </Slide>
       <Slide notes={speakerNotes[15].join('\n\n')}>
         <Slide15SharedNetworkNamespace />

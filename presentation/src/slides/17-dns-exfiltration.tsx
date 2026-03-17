@@ -23,6 +23,10 @@ export default function Slide17DnsExfiltration() {
           </ul>
         </div>
       </div>
+      <div className="callout" style={{ marginTop: '1em' }}>
+        ⚠️ Current limitation: DNS policy is <strong>zone-based</strong>, not exact-host-based. Allowing
+        <code> github.com </code> at the HTTP layer can still permit lookups under the <code>github.com</code> zone.
+      </div>
     </div>
   )
 }

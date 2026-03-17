@@ -17,14 +17,14 @@ export default function Slide18GitCredentialIsolation() {
           <ul>
             <li>📦 Separate container with a dedicated deploy key</li>
             <li>🔒 Key mounted <strong>read-only</strong> from host, outside the repo</li>
-            <li>🔌 Exposes narrow MCP tools: <code>fetch</code> and <code>push</code></li>
-            <li>✅ Validates branch and origin before every operation</li>
+            <li>🔌 Exposes narrow MCP tools: <code>describe_push_policy</code>, <code>fetch_origin</code>, <code>push_current_head</code></li>
+            <li>✅ Validates origin, locked branch, and current HEAD before push</li>
           </ul>
         </div>
       </div>
       <div className="callout" style={{ marginTop: '1em', fontSize: '1.18em' }}>
-        🔑 The agent calls <code>git_broker.push()</code> via MCP.
-        It never holds the credential that makes the push possible.
+        🔑 The agent gets <strong>operations, not credentials</strong>.
+        It calls broker tools via MCP, but never holds the key that makes the push possible.
       </div>
     </div>
   )

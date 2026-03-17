@@ -17,6 +17,7 @@ export default function Slide14ArchitectureOverview() {
             </div>
             <div className="arch-svc">openrouter-proxy<small>:4000 model access</small></div>
             <div className="arch-svc">perplexity-mcp<small>:8081 local MCP</small></div>
+            <div className="arch-svc">brave-search-mcp<small>:8083 local MCP</small></div>
             <div className="arch-svc">coredns<small>:5353 DNS allowlist</small></div>
             <div className="arch-svc primary">mitmproxy<small>HTTP policy boundary</small></div>
             <div className="arch-svc">git-broker<small>:8082 controlled Git auth</small></div>
@@ -58,6 +59,10 @@ export default function Slide14ArchitectureOverview() {
 
       <div className="callout arch-note">
         Local service calls stay on <strong>127.0.0.1</strong>. Only the checked paths can leave the namespace.
+      </div>
+      <div className="callout arch-note" style={{ marginTop: '0.7em' }}>
+        Startup also depends on a host-side initializer: it reconciles deploy-key state, detects stale shared namespaces,
+        and forces rebuild/recreate when baked policy inputs change.
       </div>
     </div>
   )
