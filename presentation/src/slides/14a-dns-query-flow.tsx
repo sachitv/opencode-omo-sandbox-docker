@@ -27,8 +27,8 @@ export default function Slide14aDnsQueryFlow() {
             </div>
             <div className="traffic-arrow fragment" data-fragment-index={3}>→</div>
             <div className="traffic-node fragment" data-fragment-index={3}>
-              <strong>upstream resolver</strong>
-              <small>only after policy approval</small>
+              <strong>Docker DNS → upstream</strong>
+              <small>allowed zones via 127.0.0.11</small>
             </div>
           </div>
           <div className="traffic-caption fragment" data-fragment-index={3}>

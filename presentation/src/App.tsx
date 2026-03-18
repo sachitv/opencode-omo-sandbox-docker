@@ -8,7 +8,6 @@ import Slide02DevcontainersSection from './slides/02-devcontainers-section'
 import Slide03WhatIsDevcontainer from './slides/03-what-is-devcontainer'
 import Slide04DevcontainerJson from './slides/04-devcontainer-json'
 import Slide05HowVscodeRuns from './slides/05-how-vscode-runs'
-import Slide06DockerCompose from './slides/06-docker-compose'
 import Slide07WhyTeamsUse from './slides/07-why-teams-use'
 import Slide08WhatDevcontainersDontGive from './slides/08-what-devcontainers-dont-give'
 import Slide09ProblemSection from './slides/09-problem-section'
@@ -172,9 +171,6 @@ export default function App() {
       </Slide>
       <Slide notes={speakerNotes[5].join('\n\n')}>
         <Slide05HowVscodeRuns />
-      </Slide>
-      <Slide notes={speakerNotes[6].join('\n\n')}>
-        <Slide06DockerCompose />
       </Slide>
       <Slide notes={speakerNotes[7].join('\n\n')}>
         <Slide07WhyTeamsUse />

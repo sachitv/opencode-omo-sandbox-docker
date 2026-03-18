@@ -26,6 +26,7 @@ networks:
         <li>🔄 Service-to-service traffic stays on <code>127.0.0.1</code> — no cross-container routing needed</li>
         <li>➡️ All outbound traffic exits through mitmproxy's network interface</li>
         <li>🛡️ iptables rules inside the shared namespace enforce the policy</li>
+        <li>🔒 <code>workspace</code> drops <code>NET_RAW</code> — unprivileged processes cannot open raw packet sockets to bypass the egress path</li>
       </ul>
     </div>
   )
