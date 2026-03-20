@@ -39,6 +39,8 @@ Important:
 
 - OpenCode is configured on port `4096`, not `4097`
 - the host can only reach these through the ports published by `mitmproxy`
+- those host-side published ports may be ephemeral unless explicitly pinned via
+  `HOST_*_PORT` environment variables
 
 ## Network Model
 
@@ -99,6 +101,8 @@ When changing behavior, start here:
   Devcontainer lifecycle hooks and forwarded ports
 - `.devcontainer/Dockerfile`
   Base image, Bun, non-root user, SSH agent disabling
+- `services/brave-search-mcp/Dockerfile`
+  Wrapper image that installs the mitmproxy CA into the Brave MCP container's system trust store
 - `.opencode/opencode.jsonc`
   OpenCode server port, model config, MCP endpoints
 - `infra/mitmproxy/entrypoint.sh`
@@ -205,10 +209,12 @@ OpenCode is started manually inside the devcontainer with `opencode serve`.
 
 Rules:
 
-- the expected host port is `4096`
-- if `localhost:4096` fails, do not guess `4097`
+- the in-container OpenCode port is `4096`
+- if a host client cannot reach OpenCode, inspect the published port mapping
+  before guessing alternate ports
 - if OpenCode is unreachable, first confirm the user actually started
   `opencode serve` inside the devcontainer
+- use `./scripts/show-published-ports.sh` to inspect the current host mappings
 
 ## Safety Rules For Agents
 

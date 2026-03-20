@@ -21,7 +21,7 @@
   "containerEnv": {
     "OPENAI_BASE_URL": "http://127.0.0.1:4000/v1",
     "PERPLEXITY_MCP_URL": "http://127.0.0.1:8081/mcp",
-    "NODE_EXTRA_CA_CERTS": "/mitmproxy-certs/mitmproxy-ca-cert.pem"
+    "MITMPROXY_CA_CERT_PATH": "/mitmproxy-certs/mitmproxy-ca-cert.pem"
   },
   "remoteEnv": {
     "SSH_AUTH_SOCK": ""

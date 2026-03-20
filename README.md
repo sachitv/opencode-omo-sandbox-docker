@@ -272,6 +272,9 @@ docker compose down
 
 Use `Dev Containers: Rebuild and Reopen in Container` from VS Code to restart it.
 
+If you change `.devcontainer/Dockerfile`, rebuild the devcontainer so the baked
+workspace image picks up those changes.
+
 ## MCP Configuration
 
 The project-level MCP configuration lives in
@@ -480,7 +483,7 @@ These environment variables are preconfigured:
 - `PERPLEXITY_MCP_URL=http://127.0.0.1:8081/mcp`
 - `GIT_BROKER_MCP_URL=http://127.0.0.1:8082/mcp`
 - `BRAVE_SEARCH_MCP_URL=http://127.0.0.1:8083/mcp`
-- `NODE_EXTRA_CA_CERTS=/mitmproxy-certs/mitmproxy-ca-cert.pem`
+- `MITMPROXY_CA_CERT_PATH=/mitmproxy-certs/mitmproxy-ca-cert.pem`
 
 That means:
 
@@ -488,6 +491,10 @@ That means:
 - Perplexity MCP is reachable over the Docker network.
 - Brave Search MCP is reachable over the Docker network.
 - The Git broker MCP can fetch from origin and push the current branch using the dedicated deploy key without exposing that key in the workspace container.
+- The workspace and helper service entrypoints install the shared `mitmproxy`
+  CA into each container's system trust store at container start, so HTTPS
+  clients trust the transparent MITM without relying on extra Node-specific CA
+  environment variables.
 - General outbound HTTP(S) traffic is transparently redirected through `mitmproxy` and constrained by the allowlist.
 - QUIC / HTTP/3 is blocked by rejecting outbound UDP on ports `80` and `443` in the shared namespace.
 - Non-web outbound traffic is blocked by the shared namespace firewall unless it is loopback traffic.
@@ -503,16 +510,30 @@ opencode serve
 ```
 
 The project config in `.opencode/opencode.jsonc` binds the server to
-`0.0.0.0:4096`, and that port is published to your host at:
+`0.0.0.0:4096`. The `mitmproxy` service publishes that container port, but the
+host-side port now defaults to an ephemeral loopback port so multiple stacks
+can run at the same time without colliding.
 
-```text
-http://localhost:4096
+Inspect the current host bindings with:
+
+```sh
+./scripts/show-published-ports.sh
 ```
 
-That lets you attach from your local machine with an SDK or CLI client while
-the actual OpenCode process stays inside the devcontainer boundary.
+If you need stable host ports for a specific stack, export one or more of these
+variables before starting the devcontainer:
 
-All published service ports are bound to `127.0.0.1` on the host, so they are only reachable from the local machine rather than every host interface.
+```sh
+export HOST_OPENCODE_PORT=4096
+export HOST_OPENROUTER_PORT=4000
+export HOST_PERPLEXITY_MCP_PORT=8081
+export HOST_GIT_BROKER_MCP_PORT=8082
+export HOST_BRAVE_SEARCH_MCP_PORT=8083
+export HOST_MITMPROXY_PORT=8080
+```
+
+All published service ports are bound to `127.0.0.1` on the host, so they are
+only reachable from the local machine rather than every host interface.
 
 ## Notes
 
@@ -525,8 +546,9 @@ All published service ports are bound to `127.0.0.1` on the host, so they are on
 - For deeper DNS threat-model details and alternatives, see
   [docs/design-dns-filtering-coredns.md](docs/design-dns-filtering-coredns.md).
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
-- The transparent proxy path relies on the helper services trusting the
-  mitmproxy CA via `NODE_EXTRA_CA_CERTS`.
+- The transparent proxy path relies on the workspace and helper service
+  entrypoints installing the shared `mitmproxy` CA into each container's system
+  trust store at startup.
 - The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
 - The devcontainer runs as a non-root `agent` user. No passwordless `sudo` is configured for package managers — granting `sudo apt-get` is a known privilege-escalation path via APT's `-o` hook flags. If the agent needs additional system packages, add them to the `apt-get install` block in `.devcontainer/Dockerfile` and rebuild.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.

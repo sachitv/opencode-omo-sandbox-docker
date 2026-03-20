@@ -1,7 +1,11 @@
 FROM node:22-bookworm-slim
 
 WORKDIR /app
-COPY package.json http-wrapper.mjs ./
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+COPY package.json http-wrapper.mjs entrypoint.sh ./
 RUN npm install --omit=dev && npm cache clean --force
+RUN chmod +x /app/entrypoint.sh
 
-CMD ["node", "http-wrapper.mjs"]
+ENTRYPOINT ["/app/entrypoint.sh"]
