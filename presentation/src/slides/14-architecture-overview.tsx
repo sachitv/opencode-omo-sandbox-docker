@@ -24,8 +24,8 @@ export default function Slide14ArchitectureOverview() {
 
         <div className="arch-connector">
           →
-          <span style={{ fontSize: '0.55em', color: 'var(--ink-dim)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 'normal', whiteSpace: 'nowrap' }}>all traffic</span>
-          <span style={{ fontSize: '0.42em', color: 'var(--ink-dim)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 'normal', whiteSpace: 'nowrap', opacity: 0.7 }}>iptables DNAT</span>
+          <span style={{ fontSize: '0.7em', color: 'var(--ink-dim)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 'normal', whiteSpace: 'nowrap' }}>all traffic</span>
+          <span style={{ fontSize: '0.58em', color: 'var(--ink-dim)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 'normal', whiteSpace: 'nowrap', opacity: 0.7 }}>iptables DNAT</span>
         </div>
 
         <div className="arch-group" style={{ border: '2px dashed rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.03)', padding: '14px', gap: '12px', display: 'flex', flexDirection: 'column' }}>
@@ -42,7 +42,7 @@ export default function Slide14ArchitectureOverview() {
 
         <div className="arch-connector">
           →
-          <span style={{ fontSize: '0.55em', color: 'var(--ink-dim)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 'normal', whiteSpace: 'nowrap' }}>approved only</span>
+          <span style={{ fontSize: '0.7em', color: 'var(--ink-dim)', fontFamily: 'JetBrains Mono, monospace', fontWeight: 'normal', whiteSpace: 'nowrap' }}>approved only</span>
         </div>
 
         <div className="arch-policy-stack">

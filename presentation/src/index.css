@@ -116,6 +116,27 @@ body {
   align-items: center;
   padding-left: 4rem;
   padding-right: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide.section-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 50%,
+    transparent 30%,
+    rgba(13, 17, 23, 0.55) 65%,
+    rgba(13, 17, 23, 0.92) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slide.section-slide .section-break {
+  position: relative;
+  z-index: 2;
 }
 
 .title-content {
@@ -242,7 +263,7 @@ code {
 }
 
 .slide pre code {
-  font-size: 0.96em;
+  font-size: 1.05em;
   line-height: 1.45;
   background: #0d1117;
   color: #c9d1d9;
@@ -431,7 +452,7 @@ code {
   border: 1px solid rgba(79, 156, 249, 0.22);
   border-radius: var(--radius);
   padding: 16px 24px 16px 52px;
-  font-size: 1.05em;
+  font-size: 1.2em;
   line-height: 1.55;
   color: var(--ink);
   position: relative;
@@ -576,7 +597,7 @@ code {
 }
 
 .arch-group-label {
-  font-size: 0.72em;
+  font-size: 1.0em;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -609,13 +630,13 @@ code {
 }
 
 .arch-group.arch-static .arch-svc {
-  font-size: 0.98em;
+  font-size: 1.08em;
   padding: 16px 18px;
   color: #eef6ff;
 }
 
 .arch-group.arch-static .arch-svc small {
-  font-size: 0.86em;
+  font-size: 0.95em;
   margin-top: 0.35em;
 }
 
@@ -636,7 +657,7 @@ code {
 }
 
 .arch-policy p {
-  font-size: 1.02em;
+  font-size: 1.12em;
   line-height: 1.45;
   color: #dce9f7;
 }
@@ -675,7 +696,7 @@ code {
 
 .terminal-label {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1em;
+  font-size: 1.2em;
   font-weight: 700;
   letter-spacing: 0.08em;
   margin-bottom: 0.55em;
@@ -823,7 +844,7 @@ code {
 
 .traffic-label {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.92em;
+  font-size: 1.1em;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -876,7 +897,7 @@ code {
 .traffic-node strong {
   display: block;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.05em;
+  font-size: 1.15em;
   letter-spacing: 0.01em;
   margin-bottom: 0.35em;
   color: #f3f8ff;
@@ -884,7 +905,7 @@ code {
 
 .traffic-node small {
   display: block;
-  font-size: 0.95em;
+  font-size: 1.05em;
   line-height: 1.45;
   color: #c9dcef;
 }
@@ -903,7 +924,7 @@ code {
 
 .traffic-caption {
   margin-top: 0.95em;
-  font-size: 1.02em;
+  font-size: 1.15em;
   color: var(--ink-dim);
 }
 

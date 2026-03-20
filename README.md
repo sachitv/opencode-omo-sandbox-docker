@@ -138,6 +138,16 @@ Important limits:
   under the `github.com` zone, and a wildcard HTTP entry such as
   `*.example.com` also permits the apex `example.com` unless policy generation
   is tightened further
+- **VS Code automatic port forwarding is an exfiltration path that bypasses
+  the network boundary entirely.** When a process inside the workspace opens
+  a listening port, VS Code's remote extension detects it and silently
+  forwards `host:PORT → container:PORT`. A process can exploit this to serve
+  workspace files, environment variables, or secrets over HTTP to any client
+  that can reach the host, without going through `mitmproxy` or the `ai_boundary`
+  firewall at all — because the channel originates from the host side, not from
+  inside the container. Set `"remote.autoForwardPorts": false` in VS Code
+  settings and use an explicit `forwardPorts` allowlist in `devcontainer.json`
+  to limit this surface.
 
 ```mermaid
 flowchart TD

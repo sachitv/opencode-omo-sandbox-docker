@@ -9,7 +9,7 @@ export default function Slide18GitCredentialIsolation() {
           <ul>
             <li>❌ No personal access token</li>
             <li>❌ No deploy key</li>
-            <li>❌ No SSH agent forwarding or <code>~/.ssh</code> mount<br/><small>(<code>SSH_AUTH_SOCK</code> is blanked)</small></li>
+            <li>❌ No SSH agent forwarding or <code>~/.ssh</code> mount<br/><span style={{ fontSize: '0.88em', color: 'var(--ink-dim)' }}>(<code>SSH_AUTH_SOCK</code> is blanked)</span></li>
           </ul>
         </div>
         <div className="card good">

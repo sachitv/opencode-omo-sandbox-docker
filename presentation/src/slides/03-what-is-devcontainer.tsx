@@ -23,7 +23,28 @@ export default function Slide03WhatIsDevcontainer() {
           </ul>
         </div>
       </div>
-      <div className="callout" style={{ marginTop: '1em' }}>
+      <div className="grid two-up" style={{ marginTop: '1em' }}>
+        <div className="card">
+          <h3>📄 With a base image</h3>
+          <pre style={{ margin: 0, fontSize: '1.2em', lineHeight: 1.7 }}>{`// .devcontainer/devcontainer.json
+{
+  "image":
+    "mcr.microsoft.com/devcontainers/base:ubuntu"
+}`}</pre>
+        </div>
+        <div className="card">
+          <h3>🐳 With a Dockerfile</h3>
+          <pre style={{ margin: 0, fontSize: '1.2em', lineHeight: 1.7 }}>{`// .devcontainer/devcontainer.json
+{
+  "build": { "dockerfile": "Dockerfile" }
+}
+
+# .devcontainer/Dockerfile
+FROM mcr.microsoft.com/devcontainers/base:ubuntu
+RUN apt-get update && apt-get install -y curl`}</pre>
+        </div>
+      </div>
+      <div className="callout" style={{ marginTop: '0.8em' }}>
         <strong>Why this matters:</strong> it runs on your machine or in the cloud, pins tools and runtimes in config, and can be rebuilt on any machine from the same repo state.
       </div>
     </div>
