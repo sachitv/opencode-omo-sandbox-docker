@@ -484,6 +484,7 @@ These environment variables are preconfigured:
 - `GIT_BROKER_MCP_URL=http://127.0.0.1:8082/mcp`
 - `BRAVE_SEARCH_MCP_URL=http://127.0.0.1:8083/mcp`
 - `MITMPROXY_CA_CERT_PATH=/mitmproxy-certs/mitmproxy-ca-cert.pem`
+- `NODE_EXTRA_CA_CERTS=/mitmproxy-certs/mitmproxy-ca-cert.pem`
 
 That means:
 
@@ -493,8 +494,10 @@ That means:
 - The Git broker MCP can fetch from origin and push the current branch using the dedicated deploy key without exposing that key in the workspace container.
 - The workspace and helper service entrypoints install the shared `mitmproxy`
   CA into each container's system trust store at container start, so HTTPS
-  clients trust the transparent MITM without relying on extra Node-specific CA
-  environment variables.
+  clients that use the OS trust store, such as `curl`, Git, and Python, trust
+  the transparent MITM without extra per-process configuration.
+- Node-based tooling still receives `NODE_EXTRA_CA_CERTS` so Node runtimes in
+  the workspace and Node-based sidecars trust the same CA consistently.
 - General outbound HTTP(S) traffic is transparently redirected through `mitmproxy` and constrained by the allowlist.
 - QUIC / HTTP/3 is blocked by rejecting outbound UDP on ports `80` and `443` in the shared namespace.
 - Non-web outbound traffic is blocked by the shared namespace firewall unless it is loopback traffic.
@@ -548,7 +551,9 @@ only reachable from the local machine rather than every host interface.
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
 - The transparent proxy path relies on the workspace and helper service
   entrypoints installing the shared `mitmproxy` CA into each container's system
-  trust store at startup.
+  trust store at startup, while Node-based runtimes also keep
+  `NODE_EXTRA_CA_CERTS` for consistent trust behavior across official Node
+  images.
 - The git broker is the only non-mitm service in the shared namespace that gets direct GitHub SSH-over-443 egress, and that exception is limited to the broker's dedicated uid in the firewall rules.
 - The devcontainer runs as a non-root `agent` user. No passwordless `sudo` is configured for package managers — granting `sudo apt-get` is a known privilege-escalation path via APT's `-o` hook flags. If the agent needs additional system packages, add them to the `apt-get install` block in `.devcontainer/Dockerfile` and rebuild.
 - Default host SSH agent forwarding is explicitly disabled inside the devcontainer by blanking `SSH_AUTH_SOCK` and setting `IdentityAgent none` in the container SSH client config.

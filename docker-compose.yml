@@ -24,6 +24,7 @@ services:
       GIT_BROKER_MCP_URL: http://127.0.0.1:8082/mcp
       BRAVE_SEARCH_MCP_URL: http://127.0.0.1:8083/mcp
       MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
       SSH_AUTH_SOCK: ""
     cap_drop:
       - NET_RAW
@@ -56,6 +57,7 @@ services:
       OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-https://example.com}
       OPENROUTER_X_TITLE: ${OPENROUTER_X_TITLE:-opencode-devcontainer}
       MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
       # Share the same mitmproxy CA so the entrypoint can install it into the system trust store.
@@ -74,6 +76,7 @@ services:
       PORT: 8081
       PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY}
       MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
       # Share the mitmproxy CA so the entrypoint can install it into the system trust store.
@@ -120,6 +123,7 @@ services:
       BRAVE_MCP_PORT: 8083
       BRAVE_MCP_HOST: 0.0.0.0
       MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
+      NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
       # Share the mitmproxy CA so the entrypoint can install it into the system trust store.
