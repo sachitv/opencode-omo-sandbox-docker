@@ -18,7 +18,7 @@ export default function Slide03cExampleDevcontainers() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8em' }}>
           <div className="card">
-            <h3 style={{ fontSize: '2.25em' }}><img src="/docker.svg" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.3em' }} />With a Dockerfile</h3>
+            <h3 style={{ fontSize: '2.25em' }}><img src="/docker.svg" alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.3em' }} />With a Dockerfile</h3>
             <pre style={{ margin: 0, fontSize: '1.44em', lineHeight: 1.7, padding: '1em' }}>{`// .devcontainer/devcontainer.json
 {
   "build": { "dockerfile": "Dockerfile" },

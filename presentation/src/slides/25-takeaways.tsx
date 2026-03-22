@@ -1,4 +1,4 @@
-export default function Slide21Takeaways() {
+export default function Slide25Takeaways() {
   return (
     <div className="slide title-slide" style={{ background: 'linear-gradient(150deg, #04111f 0%, #07090f 60%, #060f1a 100%)', position: 'relative', overflow: 'hidden' }}>
       <div className="slide-bg-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&h=1080&fit=crop)', opacity: 0.06 }} />

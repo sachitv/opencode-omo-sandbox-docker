@@ -10,7 +10,7 @@ export default function Slide20HonestTradeoffs() {
             <li>🔓 An allowlisted endpoint becoming a relay for exfiltration</li>
             <li>🌐 DNS-over-HTTPS if a DoH resolver ever enters the allowlist</li>
             <li>🧭 DNS policy is zone-based today, not exact-host-based</li>
-<li>🐛 Kernel exploits or container escapes</li>
+            <li>🐛 Kernel exploits or container escapes</li>
           </ul>
         </div>
         <div className="card">
