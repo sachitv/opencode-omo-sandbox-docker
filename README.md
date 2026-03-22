@@ -583,3 +583,8 @@ only reachable from the local machine rather than every host interface.
 - Editing the policy files in the repo does not affect an already-built or already-running proxy. Rebuild the `mitmproxy` image and recreate the container for policy changes to take effect.
 - The MITM base image is pinned to a specific `mitmproxy` release rather than `latest` so rebuilds stay predictable.
 - The `MITM_OUTPUT` nat chain is inserted at position 1 of `OUTPUT` (not appended) so it precedes Docker's embedded-resolver DNAT rules. Appending instead allows Docker to intercept `127.0.0.11:53` traffic before the custom rules fire, bypassing CoreDNS entirely.
+
+## License
+
+This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.  
+See [LICENSE.md](LICENSE.md) for the full legal text.
