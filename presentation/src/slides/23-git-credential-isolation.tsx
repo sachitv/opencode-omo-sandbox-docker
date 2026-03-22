@@ -27,6 +27,7 @@ export default function Slide18GitCredentialIsolation() {
             <li>🔒 Key mounted <strong>read-only</strong> from host, outside the repo</li>
             <li>🔌 Exposes narrow MCP tools: <code>describe_push_policy</code>, <code>fetch_origin</code>, <code>push_current_head</code></li>
             <li>✅ Validates origin, locked branch, and current HEAD before push</li>
+            <li>🛡️ UID-exempt from mitmproxy — SSH to <code>ssh.github.com:443</code> bypasses the proxy</li>
           </ul>
         </div>
       </div>
