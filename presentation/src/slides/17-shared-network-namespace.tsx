@@ -34,7 +34,7 @@ networks:
               <li>🛡️ iptables DNAT at the kernel level — <code>HTTP_PROXY</code> can't be ignored</li>
               <li>🔑 Only mitmproxy has <code>NET_ADMIN</code></li>
               <li>🔒 <code>workspace</code> drops <code>NET_RAW</code></li>
-              <li>🔐 mitmproxy CA installed into system trust store at startup — <code>curl</code>, Git, Python all trust the MITM automatically</li>
+              <li>🔐 CA auto-trusted at startup</li>
             </ul>
           </div>
           <div className="card">
