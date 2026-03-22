@@ -7,7 +7,7 @@ export default function Slide12DesignGoal() {
       </blockquote>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '0.5em', minHeight: 0 }}>
         <img
-          src="/sandbox-architecture-diagram.svg"
+          src={`${import.meta.env.BASE_URL}sandbox-architecture-diagram.svg`}
           alt="Sandbox design goal diagram"
           style={{ width: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
         />
