@@ -23,6 +23,7 @@ services:
       PERPLEXITY_MCP_URL: http://127.0.0.1:8081/mcp
       GIT_BROKER_MCP_URL: http://127.0.0.1:8082/mcp
       BRAVE_SEARCH_MCP_URL: http://127.0.0.1:8083/mcp
+      MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
       SSH_AUTH_SOCK: ""
     cap_drop:
@@ -49,22 +50,17 @@ services:
         condition: service_started
       coredns:
         condition: service_started
-    command:
-      - sh
-      - -lc
-      - |
-        until [ -f /mitmproxy-certs/mitmproxy-ca-cert.pem ]; do sleep 1; done
-        exec node server.js
     environment:
       PORT: 4000
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
       OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-https://example.com}
       OPENROUTER_X_TITLE: ${OPENROUTER_X_TITLE:-opencode-devcontainer}
+      MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
-      # Trust the same mitmproxy CA so the proxy can talk to upstream HTTPS through the MITM.
+      # Share the same mitmproxy CA so the entrypoint can install it into the system trust store.
       - mitmproxy_certs:/mitmproxy-certs:ro
 
   perplexity-mcp:
@@ -75,20 +71,15 @@ services:
         condition: service_started
       coredns:
         condition: service_started
-    command:
-      - sh
-      - -lc
-      - |
-        until [ -f /mitmproxy-certs/mitmproxy-ca-cert.pem ]; do sleep 1; done
-        exec node http-wrapper.mjs
     environment:
       HOST: 0.0.0.0
       PORT: 8081
       PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY}
+      MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
-      # Trust the mitmproxy CA for Perplexity API calls made from the MCP service.
+      # Share the mitmproxy CA so the entrypoint can install it into the system trust store.
       - mitmproxy_certs:/mitmproxy-certs:ro
 
   # Narrow Git access broker. This is the only service that gets the dedicated
@@ -119,7 +110,8 @@ services:
       - ${HOME}/.local/share/opencode-sandbox/keys:/host-agent-keys:ro
 
   brave-search-mcp:
-    image: mcp/brave-search:latest
+    build:
+      context: ./services/brave-search-mcp
     depends_on:
       mitmproxy:
         condition: service_started
@@ -130,11 +122,11 @@ services:
       BRAVE_MCP_TRANSPORT: http
       BRAVE_MCP_PORT: 8083
       BRAVE_MCP_HOST: 0.0.0.0
+      MITMPROXY_CA_CERT_PATH: /mitmproxy-certs/mitmproxy-ca-cert.pem
       NODE_EXTRA_CA_CERTS: /mitmproxy-certs/mitmproxy-ca-cert.pem
     network_mode: "service:mitmproxy"
     volumes:
-      # Trust the mitmproxy CA if the Brave MCP server makes outbound HTTPS
-      # requests through the shared transparent proxy path.
+      # Share the mitmproxy CA so the entrypoint can install it into the system trust store.
       - mitmproxy_certs:/mitmproxy-certs:ro
 
   coredns:
@@ -155,12 +147,27 @@ services:
       MITMPROXY_LISTEN_PORT: 8080
       COREDNS_UID: ${COREDNS_UID:-10002}
     ports:
-      - "127.0.0.1:4096:4096"
-      - "127.0.0.1:4000:4000"
-      - "127.0.0.1:8081:8081"
-      - "127.0.0.1:8082:8082"
-      - "127.0.0.1:8083:8083"
-      - "127.0.0.1:${MITMPROXY_PORT:-8080}:8080"
+      # Publish on loopback only. Host ports default to 0 so Docker allocates a
+      # free ephemeral port, which allows multiple stacks to run concurrently.
+      # Set any of these env vars explicitly if you need a stable host port.
+      - target: 4096
+        published: "${HOST_OPENCODE_PORT:-0}"
+        host_ip: 127.0.0.1
+      - target: 4000
+        published: "${HOST_OPENROUTER_PORT:-0}"
+        host_ip: 127.0.0.1
+      - target: 8081
+        published: "${HOST_PERPLEXITY_MCP_PORT:-0}"
+        host_ip: 127.0.0.1
+      - target: 8082
+        published: "${HOST_GIT_BROKER_MCP_PORT:-0}"
+        host_ip: 127.0.0.1
+      - target: 8083
+        published: "${HOST_BRAVE_SEARCH_MCP_PORT:-0}"
+        host_ip: 127.0.0.1
+      - target: 8080
+        published: "${HOST_MITMPROXY_PORT:-0}"
+        host_ip: 127.0.0.1
     volumes:
       # Persist the generated mitmproxy CA so the other services can trust it
       # across container restarts.
