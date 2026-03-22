@@ -119,11 +119,13 @@ const speakerNotes: Record<number, string[]> = {
     "Two-network design: ai_boundary is internal: true — no gateway, no internet, container-to-container traffic only. ai_egress is a standard bridge with a default gateway — mitmproxy's path to the internet",
     "Only mitmproxy is on both networks. Everything else joins mitmproxy's namespace and has no direct connection to either network. Even if iptables rules were bypassed, there is no egress interface available to the other services",
     "cap_drop: NET_RAW is a separate and complementary control. NET_RAW is a Linux capability that allows a process to open raw sockets — constructing packets from scratch below the normal TCP/UDP stack, specifying IP headers directly. Without it, all traffic must go through the kernel stack where iptables DNAT rules apply. With it, a process could craft raw packets that bypass those rules entirely. Dropping NET_RAW from workspace closes that gap. UDP is still allowed within the shared namespace on loopback — this only restricts what processes can do at the socket level.",
+    "CA trust: the mitmproxy CA cert is installed into the system trust store at container startup via a workspace entrypoint script. This means curl, Git, Python, and other non-Node tooling all trust the MITM automatically without manual setup. Node-based sidecars additionally use NODE_EXTRA_CA_CERTS because official Node images don't consistently honour the OS trust store.",
   ],
   16: [
     "The allowlist supports exact hostnames, wildcard subdomains, path prefixes, method restrictions, and deny-list mode",
     "Policy is baked into the mitmproxy image at build time — changing it requires a rebuild",
     "That's intentional: it prevents runtime policy drift and makes changes visible in git history",
+    "GitHub is restricted to GET and HEAD only — this closes the vector where an agent reads a public repo containing a PAT and then uses it to push via HTTPS or call write endpoints on the REST API. The git-broker is unaffected because it uses SSH over port 443 with a UID-based iptables exception that bypasses mitmproxy entirely.",
     "QUIC / HTTP3 is blocked because it runs over UDP, not TCP. iptables DNAT only intercepts TCP connections, so an HTTP/3 request over UDP 443 would bypass mitmproxy entirely and go straight out through the egress interface uninspected. Dropping UDP 80 and 443 forces clients to fall back to HTTP/1.1 or HTTP/2 over TCP, which are intercepted normally.",
   ],
   17: [

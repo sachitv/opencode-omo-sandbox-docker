@@ -2,7 +2,8 @@ const blocked: { label: string; url: string; reason: string }[] = [
   { label: 'Arbitrary outbound HTTP', url: 'https://evil.example.com/exfil', reason: '403 Forbidden (not in allowlist)' },
   { label: 'DNS tunneling', url: 'secret.attacker.io', reason: 'REFUSED (CoreDNS: not allowlisted)' },
   { label: 'DNS over TLS', url: 'kdig @1.1.1.1 +tls', reason: 'connection rejected (port 853 blocked)' },
-  { label: 'Raw git push', url: 'git push origin main', reason: 'Permission denied (no key in workspace)' },
+  { label: 'Raw git push (SSH)', url: 'git push origin main', reason: 'Permission denied (no key in workspace)' },
+  { label: 'GitHub HTTPS push with PAT', url: 'git push https://<token>@github.com/...', reason: '403 Forbidden (GitHub restricted to GET/HEAD)' },
   { label: 'QUIC / HTTP3', url: 'UDP 443', reason: 'connection refused (UDP 443 blocked)' },
 ]
 

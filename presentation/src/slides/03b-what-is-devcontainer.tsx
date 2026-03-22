@@ -35,42 +35,18 @@ export default function Slide03bWhatIsDevcontainer() {
           </div>
         </div>
 
-        {/* Right: image placeholders */}
+        {/* Right: screenshots */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-          {/* TODO: replace with screenshot of opening a devcontainer in VS Code */}
-          <div style={{
-            flex: 1,
-            border: '2px dashed rgba(180,210,240,0.3)',
-            borderRadius: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'rgba(180,210,240,0.5)',
-            fontSize: '1.1em',
-            gap: '0.5em',
-          }}>
-            <span style={{ fontSize: '2em' }}>🖼️</span>
-            <span>Opening a devcontainer in VS Code</span>
-            <span style={{ fontSize: '0.8em', opacity: 0.6 }}>[TODO: screenshot]</span>
-          </div>
+          <img src="/devcontainer-vscode-1.png" alt="VS Code notification: Reopen in Container" style={{ borderRadius: '8px', width: '100%', objectFit: 'contain' }} />
+          <img src="/devcontainer-vscode-2.png" alt="VS Code command palette: Rebuild and Reopen in Container" style={{ borderRadius: '8px', width: '100%', objectFit: 'contain' }} />
 
-          {/* TODO: replace with screenshot / recording of devcontainer CLI usage */}
-          <div style={{
-            flex: 1,
-            border: '2px dashed rgba(180,210,240,0.3)',
-            borderRadius: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'rgba(180,210,240,0.5)',
-            fontSize: '1.1em',
-            gap: '0.5em',
-          }}>
-            <span style={{ fontSize: '2em' }}>🖼️</span>
-            <span>Running with the devcontainer CLI</span>
-            <span style={{ fontSize: '0.8em', opacity: 0.6 }}>[TODO: screenshot]</span>
+          <div className="card" style={{ flex: 1, fontSize: '1.15em' }}>
+            <h3 style={{ marginTop: 0 }}>🖥️ Or use the CLI</h3>
+            <pre style={{ margin: 0, fontSize: '1em' }}><code>{`# Start the devcontainer stack
+devcontainer up
+
+# Run a command inside the container
+devcontainer exec opencode`}</code></pre>
           </div>
         </div>
 

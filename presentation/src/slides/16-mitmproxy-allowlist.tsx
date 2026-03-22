@@ -15,14 +15,12 @@ rules:
   # wildcard subdomain
   - host: "*.npmjs.com"
 
-  # specific path only
+  # GitHub: read-only — GET/HEAD only
+  # blocks push via HTTPS even if agent finds a PAT
+  - host: github.com
+    method: "GET HEAD"
   - host: api.github.com
-    path: /repos/
-
-  # block a method on an allowed host
-  - host: api.github.com
-    path: /repos/
-    method: "!DELETE"
+    method: "GET HEAD"
 
   # block an admin path on an allowed host
   - host: openrouter.ai
