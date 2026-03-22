@@ -247,7 +247,7 @@ The correct approach is always to allowlist by hostname and let DNS resolution h
 
 The default allowlist includes:
 
-- OpenRouter, Perplexity, Exa, Brave Search, Context7, and Grep App MCP endpoints
+- OpenRouter, OpenCode, Perplexity, Exa, Brave Search, Context7, and Grep App MCP endpoints
 - GitHub endpoints needed for source fetches and metadata
 - common package-manager hosts: npm, JSR, Deno, PyPI, Cargo, Go proxy, RubyGems, and Ubuntu/Debian mirrors (`archive.ubuntu.com`, `security.ubuntu.com`, `ports.ubuntu.com`, `deb.debian.org`)
 
@@ -398,6 +398,7 @@ The host-side setup helpers are:
 - [setup-agent-deploy-key.py](scripts/setup-agent-deploy-key.py)
 - [revoke-agent-deploy-key.py](scripts/revoke-agent-deploy-key.py)
 - [devcontainer-initialize-host.sh](scripts/devcontainer-initialize-host.sh)
+- [compute-devcontainer-build-fingerprint.py](scripts/compute-devcontainer-build-fingerprint.py)
 
 `setup-agent-deploy-key.py` will:
 
@@ -569,8 +570,6 @@ only reachable from the local machine rather than every host interface.
   CoreDNS image by [infra/coredns/Dockerfile](infra/coredns/Dockerfile).
 - DNS and HTTP policy now share the same source of truth (`allow-list.yaml`),
   which reduces drift between resolver policy and `mitmproxy` host policy.
-- For deeper DNS threat-model details and alternatives, see
-  [docs/design-dns-filtering-coredns.md](docs/design-dns-filtering-coredns.md).
 - The Perplexity container assumes the package exposes `dist/http.js`, which is how the official repository documents HTTP deployment.
 - The transparent proxy path relies on the workspace and helper service
   entrypoints installing the shared `mitmproxy` CA into each container's system
