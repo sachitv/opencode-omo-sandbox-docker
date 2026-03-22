@@ -77,12 +77,30 @@ mcp.context7.com:
 api.perplexity.ai:
 
 # GitHub and release assets
+# Restricted to GET and HEAD to prevent HTTPS-based git push and REST API writes.
+# The git-broker uses SSH over 443 (UID-exempted in iptables) and is unaffected
+# by this restriction — its traffic bypasses mitmproxy entirely.
+# Without this restriction, an agent that discovers a PAT (e.g. embedded in a
+# public repo it reads) could push to any GitHub repo over HTTPS or via the
+# REST API (POST /repos/.../git/refs etc.).
 github.com:
+  - GET /
+  - HEAD /
 api.github.com:
+  - GET /
+  - HEAD /
 raw.githubusercontent.com:
+  - GET /
+  - HEAD /
 codeload.github.com:
+  - GET /
+  - HEAD /
 objects.githubusercontent.com:
+  - GET /
+  - HEAD /
 release-assets.githubusercontent.com:
+  - GET /
+  - HEAD /
 
 # JS package managers
 registry.npmjs.org:
