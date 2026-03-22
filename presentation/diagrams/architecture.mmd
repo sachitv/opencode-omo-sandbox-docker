@@ -37,7 +37,8 @@ graph LR
   A --> DNS
   A --> PROXY
   GB --> DNS
-  GB --> PROXY
+  GB -->|":80 via proxy"| PROXY
+  GB -.->|"🔑 SSH :443 (bypasses proxy)"| INET
   MCP --> DNS
   MCP --> PROXY
   LLMP --> DNS
@@ -62,5 +63,6 @@ graph LR
 
   linkStyle 0,1,2,3,4 stroke:#ffffff,stroke-width:2px
   linkStyle 5,6 stroke:#f0a429,stroke-width:2px
-  linkStyle 7,8 stroke:#bc8cff,stroke-width:2px
-  linkStyle 9,10 stroke:#3ddba8,stroke-width:2px
+  linkStyle 7 stroke:#f0a429,stroke-width:2px,stroke-dasharray:5 5
+  linkStyle 8,9 stroke:#bc8cff,stroke-width:2px
+  linkStyle 10,11 stroke:#3ddba8,stroke-width:2px
