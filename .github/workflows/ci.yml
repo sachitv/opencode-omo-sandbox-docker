@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  mitmproxy-allowlist:
+    name: mitmproxy allowlist tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run tests
+        working-directory: infra/mitmproxy
+        run: uv run pytest test_allowlist.py -v
+
+  coredns-generator:
+    name: CoreDNS Corefile generator tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run tests
+        working-directory: infra/coredns
+        run: uv run pytest test_generate_corefile.py -v
+
+  git-broker:
+    name: git-broker tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: services/git-broker
+        run: bun install
+
+      - name: Run tests
+        working-directory: services/git-broker
+        run: bun test
