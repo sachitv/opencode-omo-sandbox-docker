@@ -15,6 +15,31 @@ Open `http://localhost:3000`.
 
 Press `s` in Reveal.js to open speaker notes.
 
+## Capture Screenshots
+
+The deck includes a headless Playwright capture script that exports every slide step
+to `artifacts/slide-shots/` and rebuilds `artifacts/slide-deck.pdf`.
+
+Install Chromium once:
+
+```sh
+uv run playwright install chromium
+```
+
+Then capture the full deck:
+
+```sh
+uv run scripts/capture-slide-shots.py
+```
+
+Useful overrides:
+
+```sh
+EXPORT_PDF=0 uv run scripts/capture-slide-shots.py
+MAX_CAPTURES=5 uv run scripts/capture-slide-shots.py
+HEADLESS=0 uv run scripts/capture-slide-shots.py
+```
+
 ## Diagrams
 
 Diagrams are pre-rendered as SVGs using [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli) and served as static files from `public/`. The slides reference them via `<img src="/....svg">`.
