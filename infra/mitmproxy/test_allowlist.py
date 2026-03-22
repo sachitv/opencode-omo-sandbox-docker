@@ -516,6 +516,18 @@ class TestLoadPolicy:
         rules = _load_policy()
         assert [r.pattern for r in rules] == ["alpha.com", "beta.com", "gamma.com"]
 
+    def test_ip_address_pattern_rejected(self, tmp_path, monkeypatch):
+        f = _policy_file(tmp_path, "1.2.3.4:\n")
+        monkeypatch.setattr(allowlist, "POLICY_PATH", f)
+        with pytest.raises(ValueError, match="IP addresses are not allowed"):
+            _load_policy()
+
+    def test_ipv6_pattern_rejected(self, tmp_path, monkeypatch):
+        f = _policy_file(tmp_path, '"2001:db8::1":\n')
+        monkeypatch.setattr(allowlist, "POLICY_PATH", f)
+        with pytest.raises(ValueError, match="IP addresses are not allowed"):
+            _load_policy()
+
 
 # ---------------------------------------------------------------------------
 # _check_conflicts
@@ -823,6 +835,29 @@ class TestIsAllowed:
         _set_rules(monkeypatch, [_allow_rule("example.com", PathEntry("/api"))])
         assert _is_allowed("example.com", "GET", "/api?admin=true") is True
         assert _is_allowed("example.com", "GET", "/admin?bypass=true") is False
+
+    # --- IP address blocking ---
+
+    def test_external_ipv4_blocked(self, monkeypatch):
+        _set_rules(monkeypatch, [])
+        assert _is_allowed("1.2.3.4", "GET", "/") is False
+
+    def test_external_ipv4_blocked_even_with_global_wildcard(self, monkeypatch):
+        # A global wildcard rule must not allow raw IP addresses.
+        _set_rules(monkeypatch, [_all_rule("*")])
+        assert _is_allowed("93.184.216.34", "GET", "/") is False
+
+    def test_external_ipv6_blocked(self, monkeypatch):
+        _set_rules(monkeypatch, [])
+        assert _is_allowed("2001:db8::1", "GET", "/") is False
+
+    def test_internal_ipv4_loopback_still_allowed(self, monkeypatch):
+        _set_rules(monkeypatch, [])
+        assert _is_allowed("127.0.0.1", "GET", "/anything") is True
+
+    def test_internal_ipv6_loopback_still_allowed(self, monkeypatch):
+        _set_rules(monkeypatch, [])
+        assert _is_allowed("::1", "GET", "/anything") is True
 
 
 # ---------------------------------------------------------------------------

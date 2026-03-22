@@ -31,7 +31,7 @@ rules:
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.94em' }}>
           <div className="allow-box good">
             <h3>Allowed</h3>
             <p>Whatever is explicitly listed in the policy</p>
@@ -39,6 +39,7 @@ rules:
           <div className="allow-box bad">
             <h3>Disallowed</h3>
             <p>Anything not in the policy</p>
+            <p>Raw IP addresses — always, regardless of rules</p>
           </div>
           <div className="card tight-card">
             <h3>⚙️ How it works</h3>
