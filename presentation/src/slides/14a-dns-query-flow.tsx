@@ -1,6 +1,6 @@
 export default function Slide14aDnsQueryFlow() {
   return (
-    <div className="slide flow-slide">
+    <div className="slide flow-slide" style={{ fontSize: '1.1em' }}>
       <h2>🧭 DNS Query Flow</h2>
       <p className="lede">
         DNS starts inside the agent container, gets forced through the shared namespace rules,

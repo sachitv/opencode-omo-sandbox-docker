@@ -1,7 +1,7 @@
 export default function Slide14ArchitectureOverview() {
   return (
     <div className="slide">
-      <h2>🏗️ Architecture Overview</h2>
+      <h2>🏗️ This Project's Architecture</h2>
       <p className="lede">
         The workspace and helpers share one network namespace, so local traffic stays on
         loopback and outbound traffic has to pass a single policy boundary.

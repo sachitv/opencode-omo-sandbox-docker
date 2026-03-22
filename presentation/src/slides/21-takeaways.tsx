@@ -5,17 +5,13 @@ export default function Slide21Takeaways() {
       <div className="title-content">
         <h1>Takeaways</h1>
         <ul className="takeaways">
-          <li>📦 Devcontainers are excellent for environment consistency — but <strong>containerized ≠ sandboxed</strong></li>
+          <li>📦 Devcontainers are excellent for environment consistency — but <strong>containerized != sandboxed</strong></li>
           <li>🛡️ Agentic tools need a tighter trust model: <strong>egress, DNS, and credentials</strong> are the three surfaces that matter</li>
           <li>🔗 The <strong>shared network namespace</strong> trick gives you a single policy choke point without complex routing</li>
-          <li>🌐 HTTP allowlists alone leave DNS open — <strong>close it with a resolver built from the same source of truth</strong></li>
+          <li>🌐 HTTP allowlists alone leave DNS open — <strong>enforce both from a single allow-list so policy can't drift</strong></li>
           <li>🔐 Credential isolation via a narrow broker keeps the agent <strong>functional without holding raw keys</strong></li>
           <li>✨ Practical containment beats theoretical perfection — these controls are <strong>composable and incrementally adoptable</strong></li>
         </ul>
-        <div className="speaker" style={{ marginTop: '1.5em' }}>
-          <span className="speaker-name">Sachit Vithaldas</span>
-          <span className="speaker-sub">Questions?</span>
-        </div>
       </div>
     </div>
   )

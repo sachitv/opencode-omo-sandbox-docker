@@ -1,0 +1,15 @@
+{
+  "theme": "dark",
+  "flowchart": {
+    "htmlLabels": true,
+    "nodeSpacing": 15,
+    "rankSpacing": 35,
+    "padding": 16,
+    "diagramPadding": 40,
+    "subGraphTitleMargin": { "top": 10, "bottom": 10 }
+  },
+  "themeVariables": {
+    "edgeLabelBackground": "transparent",
+    "fontSize": "24px"
+  }
+}

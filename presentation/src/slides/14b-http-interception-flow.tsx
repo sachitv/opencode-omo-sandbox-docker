@@ -1,6 +1,6 @@
 export default function Slide14bHttpInterceptionFlow() {
   return (
-    <div className="slide flow-slide">
+    <div className="slide flow-slide" style={{ fontSize: '1.1em' }}>
       <h2>🌐 HTTP Interception Flow</h2>
       <p className="lede">
         HTTP and HTTPS start the same way, but TCP <code>80</code> and <code>443</code> are transparently

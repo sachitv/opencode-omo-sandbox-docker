@@ -1,0 +1,66 @@
+graph LR
+  subgraph NET["🔗 Shared Network Namespace"]
+    subgraph NET_INNER[" "]
+      subgraph NET_INNER2[" "]
+      subgraph A_GROUP[" "]
+        direction TB
+        WS["📁 Workspace\n(bind mount)"]
+        A["🤖 OpenCode"]
+      end
+
+      subgraph GB_GROUP[" "]
+        GB["🔀 Git Broker"]
+        GBC["🔑 Deploy Key"]
+      end
+
+      subgraph MCP_GROUP[" "]
+        MCP["🔌 MCP Servers"]
+        MCPC["🔑 API Keys"]
+      end
+
+      subgraph LLM_GROUP[" "]
+        LLMP["🧠 LLM Proxy"]
+        LLMPC["🔑 API Keys"]
+      end
+      end
+    end
+  end
+
+  subgraph FILTER["🛡️ Network Controls"]
+    DNS["🔍 CoreDNS\n(DNS allowlist)"]
+    PROXY["🔒 HTTP Proxy\n(allowlist enforced)"]
+  end
+
+  A --> GB
+  A --> MCP
+  A --> LLMP
+  A --> DNS
+  A --> PROXY
+  GB --> DNS
+  GB --> PROXY
+  MCP --> DNS
+  MCP --> PROXY
+  LLMP --> DNS
+  LLMP --> PROXY
+  DNS --> PROXY
+  PROXY --> INET["🌍 Internet\n(approved traffic only)"]
+
+  style NET_INNER fill:transparent,stroke:transparent
+  style NET_INNER2 fill:transparent,stroke:transparent
+  style A_GROUP fill:#111827,stroke:#374151
+  style A fill:#131010,stroke:#ffffff,color:#c8ddf2
+  style GB fill:#2d1f0f,stroke:#f0a429,color:#c8ddf2
+  style MCP fill:#1f1040,stroke:#bc8cff,color:#c8ddf2
+  style LLMP fill:#0d2a1f,stroke:#3ddba8,color:#c8ddf2
+  style GBC fill:#2d2a0f,stroke:#f0b429,color:#c8ddf2
+  style MCPC fill:#2d2a0f,stroke:#f0b429,color:#c8ddf2
+  style LLMPC fill:#2d2a0f,stroke:#f0b429,color:#c8ddf2
+  style WS fill:#1a2a3d,stroke:#2b5d9e,color:#c8ddf2
+  style DNS fill:#0d2530,stroke:#26c6da,color:#c8ddf2
+  style PROXY fill:#0d2137,stroke:#58a6ff,color:#c8ddf2
+  style INET fill:#1a3d2b,stroke:#3fb950,color:#c8ddf2
+
+  linkStyle 0,1,2,3,4 stroke:#ffffff,stroke-width:2px
+  linkStyle 5,6 stroke:#f0a429,stroke-width:2px
+  linkStyle 7,8 stroke:#bc8cff,stroke-width:2px
+  linkStyle 9,10 stroke:#3ddba8,stroke-width:2px

@@ -315,20 +315,10 @@ code {
   position: relative;
 }
 
-.speaker::before {
-  content: "";
-  display: block;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #2b5d9e);
-  box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
-}
-
 .speaker-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
-  font-size: 1.1em;
+  font-size: 2.2em;
   color: var(--ink);
 }
 
@@ -571,6 +561,7 @@ code {
 
 .title-slide .speaker {
   margin-top: 1.2em;
+  justify-content: center;
 }
 
 .title-slide h1 {
@@ -682,12 +673,13 @@ code {
   margin: 1.1em auto 0;
   width: min(1120px, 100%);
   display: grid;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
   text-align: left;
 }
 
 .takeaways li {
-  margin: 0;
+  margin: 0 0 12px;
   padding: 18px 22px;
   border-radius: var(--radius);
   border: 1px solid rgba(180, 210, 240, 0.16);

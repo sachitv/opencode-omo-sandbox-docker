@@ -4,22 +4,22 @@ export default function Slide11TrustProblem() {
       <h2>🔓 The Trust Problem</h2>
       <p className="lede">When the agent runs in your devcontainer, it inherits everything you gave that container.</p>
       <div style={{ display: 'flex', gap: '1.5em', alignItems: 'stretch', marginTop: '0.8em', flex: 1 }}>
-        <div className="threat-grid" style={{ flex: 1, alignContent: 'stretch' }}>
-          <div className="threat">
-            <div className="threat-label">🕵️ Data exfiltration via DNS</div>
-            <div className="threat-detail">Encode secrets as subdomain labels. Send small UDP queries. Bypasses HTTP allowlists entirely — DNS is not HTTP.</div>
-          </div>
+        <div className="threat-grid" style={{ flex: 1, alignContent: 'stretch', fontSize: '1.2em' }}>
           <div className="threat">
             <div className="threat-label">📡 Calling arbitrary external services</div>
-            <div className="threat-detail">Contact any endpoint: receive instructions, exfiltrate context, or phone home. No restriction by default.</div>
-          </div>
-          <div className="threat">
-            <div className="threat-label">🔑 Git credential abuse</div>
-            <div className="threat-detail">Push to any branch the deploy key allows. Force-push. Rewrite history. The key in the workspace is the key.</div>
+            <div className="threat-detail"><ul><li>Contact any endpoint</li><li>Receive instructions or exfiltrate context</li><li>No restriction by default</li></ul></div>
           </div>
           <div className="threat">
             <div className="threat-label">💀 Secret leakage</div>
-            <div className="threat-detail">Read <code>.env</code> files, SSH keys, cloud credentials — anything mounted or forwarded into the container.</div>
+            <div className="threat-detail"><ul><li>Read .env files, SSH keys, cloud credentials</li><li>Anything mounted or forwarded into the container</li></ul></div>
+          </div>
+          <div className="threat">
+            <div className="threat-label">🔑 Git credential abuse</div>
+            <div className="threat-detail"><ul><li>Push to any branch the deploy key allows</li><li>Force-push or rewrite history</li><li>The key in the workspace is the key</li></ul></div>
+          </div>
+          <div className="threat">
+            <div className="threat-label">🕵️ Data exfiltration via DNS</div>
+            <div className="threat-detail"><ul><li>Encode secrets as subdomain labels</li><li>Small UDP queries bypass HTTP allowlists</li><li>DNS is not HTTP</li></ul></div>
           </div>
         </div>
       </div>
