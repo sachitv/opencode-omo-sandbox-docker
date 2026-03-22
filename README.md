@@ -1,6 +1,6 @@
 # Opencode Sandbox Devcontainer
 
-**Documentation:** https://sachitv.github.io/opencode-omo-sandbox-docker/
+**Presentation:** https://sachitv.github.io/opencode-omo-sandbox-docker/
 
 This repository sets up a devcontainer for running OpenCode, or another agentic
 CLI, inside a constrained Docker sandbox.
