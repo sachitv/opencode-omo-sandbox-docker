@@ -36,7 +36,7 @@ export default function Slide14aDnsQueryFlow() {
           </div>
         </div>
 
-        <div className="traffic-card bad">
+        <div className="traffic-card bad fragment" data-fragment-index={4}>
           <div className="traffic-label">Rejected DNS query</div>
           <div className="traffic-lane">
             <div className="traffic-node origin bad">
