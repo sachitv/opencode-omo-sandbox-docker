@@ -19,7 +19,8 @@ function createSpeakerViewPatcher(width: number, height: number) {
       try {
         const popupDocument = popup.document
 
-        if (!popupDocument.body) {
+        // Wait until both head and body are ready.
+        if (!popupDocument.head || !popupDocument.body) {
           popup.setTimeout(installPatch, 50)
           return
         }
@@ -44,9 +45,11 @@ function createSpeakerViewPatcher(width: number, height: number) {
         // Use a MutationObserver to fix each iframe's width/height attributes
         // the moment it is added to the DOM — before the nested reveal.js
         // instance initialises and reads those values to size its viewport.
-        // We construct MutationObserver from the popup window's realm so that
-        // instanceof checks work correctly for cross-window DOM nodes.
-        const PopupMutationObserver = (popup as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver
+        // We use the popup window's MutationObserver with a fallback to the
+        // main window's, because we compare using .nodeName rather than
+        // instanceof, so either realm's constructor works correctly.
+        const PopupMutationObserver =
+          (popup as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver ?? MutationObserver
         const observer = new PopupMutationObserver((mutations: MutationRecord[]) => {
           for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
@@ -94,12 +97,22 @@ function createSpeakerViewPatcher(width: number, height: number) {
       const container = iframe.parentElement
       if (!container) return
 
+      // Use the popup's event loop for setTimeout so the retry fires in the
+      // right browsing context, even if the popup's event loop is separate.
+      const popupSetTimeout = doc.defaultView?.setTimeout?.bind(doc.defaultView) ?? setTimeout
+
+      const MAX_RETRIES = 60
+      let retries = 0
+
       const applyTransform = () => {
         const containerW = container.clientWidth
         const containerH = container.clientHeight
         if (!containerW || !containerH) {
-          // Container not yet laid out — retry shortly.
-          setTimeout(applyTransform, 16)
+          // Container not yet laid out — retry, but cap to avoid an infinite
+          // loop in notes-only layouts where the container stays hidden.
+          if (retries++ < MAX_RETRIES) {
+            popupSetTimeout(applyTransform, 16)
+          }
           return
         }
 
