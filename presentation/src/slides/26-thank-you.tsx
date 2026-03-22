@@ -20,6 +20,7 @@ export default function Slide26ThankYou() {
               <QRCodeSVG
                 value={GITHUB_URL}
                 size={220}
+                level="H"
                 imageSettings={{ src: GITHUB_SVG, width: 40, height: 40, excavate: true }}
               />
             </div>
@@ -32,6 +33,7 @@ export default function Slide26ThankYou() {
               <QRCodeSVG
                 value={LINKEDIN_URL}
                 size={220}
+                level="H"
                 imageSettings={{ src: LINKEDIN_SVG, width: 40, height: 40, excavate: true }}
               />
             </div>
