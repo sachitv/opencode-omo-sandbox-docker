@@ -7,7 +7,7 @@ export default function Slide14bArchitectureDiagram() {
       </p>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '0.5em', minHeight: 0 }}>
         <img
-          src="/architecture-diagram.svg"
+          src={`${import.meta.env.BASE_URL}architecture-diagram.svg`}
           alt="Architecture diagram"
           style={{ width: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
         />

@@ -9,11 +9,11 @@ export default function Slide03bWhatIsDevcontainer() {
         {/* Left: text */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', fontSize: '1.13em' }}>
           <ul style={{ margin: 0, paddingLeft: '1.2em', lineHeight: 1.8, flex: 1 }}>
-            <li><img src="/docker.svg" alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.4em' }} />Docker container for development</li>
+            <li><img src={`${import.meta.env.BASE_URL}docker.svg`} alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.4em' }} />Docker container for development</li>
             <li>⚡ Convenient to run
               <ul style={{ fontSize: '0.7em' }}>
-                <li><img src="/vscode.svg" alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.4em' }} />Open in VS Code</li>
-                <li><img src="/terminal.svg" alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.4em' }} />Run via CLI</li>
+                <li><img src={`${import.meta.env.BASE_URL}vscode.svg`} alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.4em' }} />Open in VS Code</li>
+                <li><img src={`${import.meta.env.BASE_URL}terminal.svg`} alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.4em' }} />Run via CLI</li>
               </ul>
             </li>
             <li>📂 Writable source code mount</li>
@@ -37,8 +37,8 @@ export default function Slide03bWhatIsDevcontainer() {
 
         {/* Right: screenshots */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-          <img src="/devcontainer-vscode-1.png" alt="VS Code notification: Reopen in Container" style={{ borderRadius: '8px', width: '100%', objectFit: 'contain' }} />
-          <img src="/devcontainer-vscode-2.png" alt="VS Code command palette: Rebuild and Reopen in Container" style={{ borderRadius: '8px', width: '100%', objectFit: 'contain' }} />
+          <img src={`${import.meta.env.BASE_URL}devcontainer-vscode-1.png`} alt="VS Code notification: Reopen in Container" style={{ borderRadius: '8px', width: '100%', objectFit: 'contain' }} />
+          <img src={`${import.meta.env.BASE_URL}devcontainer-vscode-2.png`} alt="VS Code command palette: Rebuild and Reopen in Container" style={{ borderRadius: '8px', width: '100%', objectFit: 'contain' }} />
 
           <div className="card" style={{ flex: 1, fontSize: '1.15em' }}>
             <h3 style={{ marginTop: 0 }}>🖥️ Or use the CLI</h3>
