@@ -5,7 +5,7 @@ graph LR
     C["🔀 Git Broker"]
   end
 
-  A -->|"✅ allowed"| D["📦 Allowlisted APIs"]
+  A -->|"✅ allowed"| D["📦 Allowlisted origins"]
   C -->|"✅ allowed"| E["🔀 Git Remote"]
   A -. "🚫 blocked" .-> F["🌐 Arbitrary Internet"]
   A -. "🚫 blocked" .-> G["💀 Raw Credentials"]
