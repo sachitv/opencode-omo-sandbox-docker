@@ -23,3 +23,9 @@ Under the following terms:
 
 - Full legal code: [https://creativecommons.org/licenses/by-nc/4.0/legalcode](https://creativecommons.org/licenses/by-nc/4.0/legalcode)
 - This work is provided **as-is**, without warranty of any kind, express or implied.
+
+## Attribution
+
+If you share or adapt this work, attribution is required. Example:
+
+> © 2026 Sachit Vithaldas — Licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
