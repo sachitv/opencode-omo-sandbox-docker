@@ -1,6 +1,6 @@
 export default function Slide05HowVscodeRuns() {
   return (
-    <div className="slide" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '90vh' }}>
+    <div className="slide" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '100%' }}>
       <h2>🔌 How VS Code Actually Runs Devcontainers</h2>
       <div className="flow" style={{ flex: 1, alignItems: 'stretch', gap: '16px', margin: '1.5em 0' }}>
         <div className="step" style={{ fontSize: '1.8em', padding: '1.35em 1.2em', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>

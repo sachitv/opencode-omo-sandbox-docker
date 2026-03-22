@@ -1,7 +1,7 @@
 import { Deck, Slide } from '@revealjs/react'
-import RevealNotes from 'reveal.js/plugin/notes'
 import 'reveal.js/reveal.css'
 import './index.css'
+import { createRevealNotesAspectFix } from './reveal-notes-aspect-fix'
 
 import Slide01Intro from './slides/01-intro'
 import Slide02Disclaimer from './slides/02-disclaimer'
@@ -162,21 +162,23 @@ const speakerNotes: Record<number, string[]> = {
 }
 
 export default function App() {
+  const revealNotes = createRevealNotesAspectFix(1600, 1000)
+
   return (
     <Deck
       config={{
         hash: true,
         width: 1600,
-        height: 900,
+        height: 1000,
         margin: 0.015,
-        center: false,
+        center: true,
         controls: false,
         progress: false,
         slideNumber: false,
         transition: 'slide',
         backgroundTransition: 'fade',
       }}
-      plugins={[RevealNotes]}
+      plugins={[revealNotes]}
     >
       <Slide notes={speakerNotes[1].join('\n\n')}>
         <Slide01Intro />
