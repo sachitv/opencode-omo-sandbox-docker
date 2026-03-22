@@ -138,6 +138,16 @@ Important limits:
   under the `github.com` zone, and a wildcard HTTP entry such as
   `*.example.com` also permits the apex `example.com` unless policy generation
   is tightened further
+- **VS Code automatic port forwarding is an exfiltration path that bypasses
+  the network boundary entirely.** When a process inside the workspace opens
+  a listening port, VS Code's remote extension detects it and silently
+  forwards `host:PORT → container:PORT`. A process can exploit this to serve
+  workspace files, environment variables, or secrets over HTTP to any client
+  that can reach the host, without going through `mitmproxy` or the `ai_boundary`
+  firewall at all — because the channel originates from the host side, not from
+  inside the container. Set `"remote.autoForwardPorts": false` in VS Code
+  settings and use an explicit `forwardPorts` allowlist in `devcontainer.json`
+  to limit this surface.
 
 ```mermaid
 flowchart TD
@@ -220,7 +230,18 @@ sensitive.example.com:        # deny-list → all paths except these
 - allow-list mode (positive entries) and deny-list mode (`!`-prefixed entries) cannot be mixed in one rule
 - matching precedence: exact host > longest wildcard subdomain > `*`
 - request paths are normalised before matching (dot segments, double slashes, and percent-encoding are resolved)
+- **raw IP addresses are always blocked**, even if a global `"*"` rule is present — allowlist rules are hostname-only
 - policy changes require rebuilding the `mitmproxy` image
+
+**Why IP addresses are blocked and cannot be allowlisted:**
+
+The allowlist matches on the HTTP `Host` header — the hostname the client declares in its request, not the IP it actually connected to. A client sending a request to an external IP address may set any `Host` header it chooses. Allowing raw IPs would mean:
+
+1. The policy check runs on a bare IP rather than a meaningful hostname, so rules cannot express intent.
+2. A client could connect to an allowlisted IP (for example, a shared CDN range) with a spoofed `Host` header, bypassing hostname-based controls.
+3. CDN and cloud IPs rotate frequently — an IP that resolves to a safe host today may belong to a different service tomorrow.
+
+The correct approach is always to allowlist by hostname and let DNS resolution happen normally.
 
 The default allowlist includes:
 

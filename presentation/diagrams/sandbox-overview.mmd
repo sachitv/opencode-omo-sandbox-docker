@@ -1,0 +1,18 @@
+graph LR
+  subgraph SB["🛡️ Sandbox"]
+    A["🤖 AI Agent"]
+    B["📁 Workspace"]
+    C["🔀 Git Broker"]
+  end
+
+  A -->|"✅ allowed"| D["📦 Allowlisted origins"]
+  C -->|"✅ allowed"| E["🔀 Git Remote"]
+  A -. "🚫 blocked" .-> F["🌐 Arbitrary Internet"]
+  A -. "🚫 blocked" .-> G["💀 Raw Credentials"]
+  A -. "🚫 blocked" .-> H["🕵️ DNS Exfiltration"]
+
+  style D fill:#1a3d2b,stroke:#3fb950,color:#c8ddf2
+  style E fill:#1a3d2b,stroke:#3fb950,color:#c8ddf2
+  style F fill:#3d1a1a,stroke:#f85149,color:#c8ddf2
+  style G fill:#3d1a1a,stroke:#f85149,color:#c8ddf2
+  style H fill:#3d1a1a,stroke:#f85149,color:#c8ddf2

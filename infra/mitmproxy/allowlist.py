@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ipaddress
 import posixpath
 import re
 from enum import Enum, auto
@@ -64,6 +65,15 @@ INTERNAL_HOSTS: frozenset[str] = frozenset(
 )
 
 _PATTERN_RE = re.compile(r"^(\*\.)?[a-z0-9][a-z0-9._-]*$")
+
+
+def _is_ip_address(host: str) -> bool:
+    """Return True if host is a raw IPv4 or IPv6 address."""
+    try:
+        ipaddress.ip_address(host)
+        return True
+    except ValueError:
+        return False
 
 # All HTTP methods we recognise as method prefixes in path entries.
 _HTTP_METHODS: frozenset[str] = frozenset(
@@ -325,6 +335,12 @@ def _load_policy() -> list[HostRule]:
             raise ValueError(f"Duplicate host pattern: '{pattern}'")
         seen.add(pattern)
 
+        if _is_ip_address(pattern):
+            raise ValueError(
+                f"Invalid host pattern: '{pattern}'. "
+                f"IP addresses are not allowed as allowlist patterns — use hostnames only."
+            )
+
         if pattern != "*" and not _PATTERN_RE.match(pattern):
             raise ValueError(
                 f"Invalid host pattern: '{pattern}'. "
@@ -385,6 +401,8 @@ def _is_allowed(host: str, method: str, path: str) -> bool:
     host = host.lower().rstrip(".")
     if host in INTERNAL_HOSTS:
         return True
+    if _is_ip_address(host):
+        return False
     rule = _find_rule(host)
     if rule is None:
         return False

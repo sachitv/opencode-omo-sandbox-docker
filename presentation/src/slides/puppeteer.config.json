@@ -1,0 +1,3 @@
+{
+  "args": ["--allow-file-access-from-files", "--no-sandbox", "--disable-web-security"]
+}
