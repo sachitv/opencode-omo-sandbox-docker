@@ -1022,6 +1022,321 @@ code {
   margin-top: 2px;
 }
 
+.vision-diagram {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  margin-top: 1em;
+}
+
+.vision-actor,
+.vision-machine,
+.vision-network,
+.vision-node {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.vision-actor,
+.vision-machine,
+.vision-network {
+  padding: 24px 26px;
+}
+
+.vision-actor {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(88, 166, 255, 0.12), transparent 60%),
+    rgba(255, 255, 255, 0.05);
+}
+
+.vision-avatar {
+  font-size: 3.2em;
+  line-height: 1;
+  margin-bottom: 0.3em;
+}
+
+.vision-actor.accent {
+  background:
+    radial-gradient(circle at top, rgba(240, 180, 41, 0.16), transparent 60%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(240, 180, 41, 0.24);
+}
+
+.vision-actor-solo {
+  width: 100%;
+  min-height: 188px;
+}
+
+.vision-kicker,
+.vision-machine-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8em;
+}
+
+.vision-actor.accent .vision-kicker {
+  color: var(--amber);
+}
+
+.vision-actor h3,
+.vision-machine h3,
+.vision-node strong {
+  margin: 0;
+}
+
+.vision-actor h3 {
+  font-size: 1.7em;
+  letter-spacing: -0.02em;
+  color: #f3f8ff;
+}
+
+.vision-actor p,
+.vision-node small {
+  color: #d6e5f6;
+}
+
+.vision-section + .vision-section {
+  margin-top: 1em;
+}
+
+.vision-workflow-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.95fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.vision-panel {
+  border-radius: 12px;
+  border: 1px solid rgba(180, 210, 240, 0.18);
+  background: rgba(9, 17, 27, 0.48);
+  padding: 16px;
+}
+
+.vision-panel + .vision-panel {
+  margin-top: 0;
+}
+
+.vision-network p {
+  color: #d6e5f6;
+  font-size: 1.15em;
+  line-height: 1.5;
+}
+
+.vision-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 2.5em;
+  text-shadow: 0 0 18px rgba(88, 166, 255, 0.35);
+}
+
+.vision-link small {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.34em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.vision-boundary-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--amber);
+  font-size: 2.2em;
+  text-shadow: 0 0 18px rgba(240, 180, 41, 0.28);
+  margin: 0.35em 0 0.2em;
+}
+
+.vision-boundary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 0.35em;
+}
+
+.vision-boundary-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.vision-boundary-link small {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.46em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.vision-machine {
+  width: 100%;
+  min-width: 0;
+  background:
+    linear-gradient(180deg, rgba(88, 166, 255, 0.08), rgba(255, 255, 255, 0.04)),
+    rgba(9, 17, 27, 0.88);
+  border-color: rgba(88, 166, 255, 0.3);
+  box-shadow: 0 0 32px rgba(88, 166, 255, 0.08);
+}
+
+.vision-network {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+  background:
+    radial-gradient(circle at top, rgba(240, 180, 41, 0.14), transparent 58%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(240, 180, 41, 0.28);
+}
+
+.vision-network h3 {
+  color: var(--amber);
+}
+
+.vision-network.good {
+  background:
+    radial-gradient(circle at top, rgba(63, 185, 80, 0.14), transparent 58%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(63, 185, 80, 0.28);
+}
+
+.vision-network.good h3,
+.vision-network.good .vision-kicker {
+  color: var(--good);
+}
+
+.vision-network.warn {
+  background:
+    radial-gradient(circle at top, rgba(240, 180, 41, 0.16), transparent 58%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(240, 180, 41, 0.3);
+}
+
+.vision-network.warn h3,
+.vision-network.warn .vision-kicker {
+  color: var(--amber);
+}
+
+.vision-network.accent {
+  background:
+    radial-gradient(circle at top, rgba(88, 166, 255, 0.16), transparent 58%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(88, 166, 255, 0.3);
+}
+
+.vision-network.accent h3,
+.vision-network.accent .vision-kicker {
+  color: var(--accent);
+}
+
+.vision-network.bad {
+  background:
+    radial-gradient(circle at top, rgba(248, 81, 73, 0.16), transparent 58%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(248, 81, 73, 0.3);
+}
+
+.vision-network.bad h3,
+.vision-network.bad .vision-kicker {
+  color: var(--bad);
+}
+
+.vision-shell {
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px dashed rgba(180, 210, 240, 0.28);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vision-shell-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.vision-collab-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.vision-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.vision-tool {
+  border-radius: 12px;
+  border: 1px solid rgba(180, 210, 240, 0.2);
+  background: rgba(9, 17, 27, 0.78);
+  padding: 14px 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.35em;
+  color: #eef6ff;
+}
+
+
+.vision-node {
+  padding: 18px 20px;
+  background: rgba(9, 17, 27, 0.82);
+}
+
+.vision-node.sandbox {
+  border-color: rgba(240, 180, 41, 0.32);
+  background:
+    linear-gradient(90deg, rgba(240, 180, 41, 0.12), rgba(88, 166, 255, 0.08)),
+    rgba(9, 17, 27, 0.82);
+  padding-bottom: 22px;
+}
+
+.vision-node.primary {
+  border-color: rgba(88, 166, 255, 0.38);
+  background: rgba(88, 166, 255, 0.14);
+}
+
+.vision-node.repo {
+  border-color: rgba(63, 185, 80, 0.35);
+  background:
+    linear-gradient(90deg, rgba(63, 185, 80, 0.14), rgba(88, 166, 255, 0.08)),
+    rgba(9, 17, 27, 0.82);
+}
+
+.vision-node strong {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.2em;
+  color: #f1f7ff;
+  margin-bottom: 0.3em;
+}
+
+.vision-node small {
+  display: block;
+  font-size: 1.05em;
+  line-height: 1.45;
+}
+
 @media (max-width: 900px) {
   .two-up,
   .three-up,
@@ -1032,12 +1347,17 @@ code {
   .git-grid,
   .mini-grid,
   .traffic-grid,
-  .traffic-stack { grid-template-columns: 1fr; }
+  .traffic-stack,
+  .vision-shell-row,
+  .vision-collab-row,
+  .vision-tools-grid,
+  .vision-boundary-grid,
+  .vision-workflow-grid { grid-template-columns: 1fr; }
 
   .arch-stage { grid-template-columns: 1fr; }
   .traffic-lane { grid-template-columns: 1fr; }
-  .arch-wrap { flex-direction: column; }
-  .arch-connector { transform: rotate(90deg); }
+  .arch-connector,
+  .vision-link { transform: rotate(90deg); }
 
   .flow { flex-direction: column; }
   .arrow { transform: rotate(90deg); }

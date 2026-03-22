@@ -2,7 +2,7 @@ export default function Slide10AgenticTools() {
   return (
     <div className="slide">
       <h2>🤖 Agentic Coding Tools</h2>
-      <p className="lede" style={{ fontSize: '1.5em' }}>Tools like OpenCode give an LLM access to your development environment — on purpose.</p>
+      <p className="lede" style={{ fontSize: '1.8em', fontWeight: 700 }}>Tools like OpenCode give an LLM access to your development environment — on purpose.</p>
       <div className="grid two-up" style={{ marginTop: '1em', fontSize: '1.5em' }}>
         <div className="card">
           <h3>⚡ What they can do</h3>
