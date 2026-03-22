@@ -586,5 +586,5 @@ only reachable from the local machine rather than every host interface.
 
 ## License
 
-This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.  
-See [LICENSE.md](LICENSE.md) for the full legal text.
+This project is licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).  
+See [LICENSE.md](LICENSE.md) for details.
