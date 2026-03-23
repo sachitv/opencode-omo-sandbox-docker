@@ -51,6 +51,19 @@ export default function Slide19WhatGetsBlocked() {
           ))}
         </div>
       </div>
+      <aside className="notes">
+        The sandbox is opinionated but not unusable. Real developer workflows still work.
+
+        npm install, pip install, cargo build, GitHub fetches, Perplexity and Brave
+        search, model access via proxy, everything a coding agent actually needs is allowed.
+
+        What's blocked: arbitrary outbound HTTP, DNS tunneling, DNS-over-TLS bypass,
+        raw git push with no key in workspace, GitHub HTTPS push even with a PAT due
+        to the GET and HEAD restriction, and QUIC or HTTP3.
+
+        When the agent hits a deny response it knows immediately the request was blocked.
+        There's no silent failure.
+      </aside>
     </div>
   )
 }

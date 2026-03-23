@@ -11,6 +11,12 @@ export default function Slide13SandboxSection() {
           <div style={{ background: 'rgba(63,185,80,0.1)', border: '1px solid rgba(63,185,80,0.3)', borderRadius: '12px', padding: '0.7em 1.4em', fontSize: '1.25em', color: '#c8ddf2' }}>🔐 git-broker credential isolation</div>
         </div>
       </div>
+      <aside className="notes">
+        Three layered controls. Egress: mitmproxy with an allowlist intercepts all
+        outbound HTTP and HTTPS. DNS: CoreDNS generated from the same allowlist closes
+        the DNS exfiltration channel. Credentials: git-broker holds the deploy key
+        so the workspace never does.
+      </aside>
     </div>
   )
 }

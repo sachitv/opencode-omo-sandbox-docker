@@ -14,7 +14,7 @@ export default function Slide08WhatDevcontainersDontGive() {
           </ul>
         </div>
         <div className="card">
-          <h3>❌ What you don't get automatically</h3>
+          <h3>🛠️ What you need to configure</h3>
           <ul>
             <li>🚧 Egress filtering</li>
             <li>🔍 DNS controls</li>
@@ -24,6 +24,19 @@ export default function Slide08WhatDevcontainersDontGive() {
           </ul>
         </div>
       </div>
+      <aside className="notes">
+        A normal devcontainer hands the agent your full dev environment. That's fine
+        when the agent is you. It's a problem when it's an LLM making autonomous decisions.
+
+        VS Code can mount the host SSH auth socket into the container. Any process
+        inside can use your host SSH keys to authenticate to remote servers without
+        ever seeing the private key material directly.
+
+        The agent also gets your Git credentials, cloud credentials, mounted secrets,
+        and any environment variables you inject.
+
+        The blast radius of a mistake is determined by how much access the agent has.
+      </aside>
     </div>
   )
 }

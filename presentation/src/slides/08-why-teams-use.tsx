@@ -23,6 +23,23 @@ export default function Slide07WhyTeamsUse() {
           </ul>
         </div>
       </div>
+      <aside className="notes">
+        Devcontainers are genuinely useful, but they're not magic.
+
+        You get standardization, reproducibility, and no local dependency pollution.
+        In exchange you deal with container lifecycle friction, volume semantics,
+        and permission mismatches.
+
+        The important one for this talk: containerized does not automatically mean
+        secure. A normal devcontainer is a comfortable developer environment, not
+        a sandbox.
+
+        On Apple Silicon, x86 images run under Rosetta emulation. That's noticeable
+        slowdown, and not all images publish multi-arch builds.
+
+        Shell config like .zshrc and .gitconfig doesn't carry over automatically.
+        VS Code has a dotfiles repo feature, but it needs explicit setup.
+      </aside>
     </div>
   )
 }

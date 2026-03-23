@@ -60,6 +60,18 @@ export default function Slide14ArchitectureOverview() {
       <div className="callout arch-note">
         Local service calls stay on <strong>127.0.0.1</strong>. Only the checked paths can leave the namespace.
       </div>
+      <aside className="notes">
+        All services share mitmproxy's network namespace, so they have no independent
+        egress path.
+
+        Local service traffic between OpenCode and its sidecars stays on loopback.
+        All outbound funnels through one policy point.
+
+        mitmproxy is the only container with real external egress. It's the sole gateway.
+
+        openrouter-proxy is a local sidecar that holds the OpenRouter API key. The
+        workspace sends requests to 127.0.0.1:4000/v1 and never sees the real key.
+      </aside>
     </div>
   )
 }

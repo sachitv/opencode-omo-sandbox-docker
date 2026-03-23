@@ -64,6 +64,16 @@ export default function Slide14aDnsQueryFlow() {
           </div>
         </div>
       </div>
+      <aside className="notes">
+        Every DNS query from the workspace is redirected to CoreDNS on 127.0.0.53:5353
+        via iptables DNAT before it can reach Docker's resolver or the internet.
+
+        CoreDNS only forwards queries for allowlisted zones upstream. Everything else
+        gets REFUSED.
+
+        This closes the subdomain-encoding and DNS tunnel exfiltration vectors that
+        HTTP-only controls leave open.
+      </aside>
     </div>
   )
 }

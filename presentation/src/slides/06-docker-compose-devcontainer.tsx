@@ -34,6 +34,19 @@ services:
           </ul>
         </div>
       </div>
+      <aside className="notes">
+        The dockerComposeFile plus service pairing is what this project uses. The
+        workspace is just one service in a larger Compose stack.
+
+        initializeCommand runs on the host before anything builds or starts. I use
+        it for deploy key setup and stale container cleanup.
+
+        containerEnv lets you inject environment variables into the workspace. The
+        proxy holds the real API key, so the agent only ever sees a localhost URL.
+
+        devcontainer up and devcontainer exec are the CLI equivalents. You can bring
+        the stack up and run commands inside without VS Code at all.
+      </aside>
     </div>
   )
 }

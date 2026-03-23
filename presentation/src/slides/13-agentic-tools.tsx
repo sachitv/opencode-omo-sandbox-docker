@@ -2,7 +2,7 @@ export default function Slide10AgenticTools() {
   return (
     <div className="slide">
       <h2>🤖 Agentic Coding Tools</h2>
-      <p className="lede" style={{ fontSize: '1.5em' }}>Tools like OpenCode give an LLM access to your development environment — on purpose.</p>
+      <p className="lede" style={{ fontSize: '1.8em', fontWeight: 700 }}>Tools like OpenCode give an LLM access to your development environment — on purpose.</p>
       <div className="grid two-up" style={{ marginTop: '1em', fontSize: '1.5em' }}>
         <div className="card">
           <h3>⚡ What they can do</h3>
@@ -26,6 +26,16 @@ export default function Slide10AgenticTools() {
           </ul>
         </div>
       </div>
+      <aside className="notes">
+        The access is intentional. These tools need it to be useful. Read and write
+        files, run commands, make HTTP requests, call APIs, that's the job.
+
+        The question is whether the access should be completely unrestricted, or
+        whether meaningful controls can coexist with usefulness.
+
+        Yes, they can. Scope the access, don't remove it. The agent still needs to
+        work. It just shouldn't have a blank cheque.
+      </aside>
     </div>
   )
 }

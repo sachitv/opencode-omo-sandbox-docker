@@ -47,6 +47,31 @@ networks:
           </div>
         </div>
       </div>
+      <aside className="notes">
+        The core architectural move: sharing the network namespace gives you a single
+        choke point without sidecar injection or complex routing.
+
+        network_mode: service:mitmproxy means the service joins mitmproxy's network
+        namespace instead of getting its own. No separate interface, no Docker DNS.
+        Services are just ports on 127.0.0.1.
+
+        DNAT stands for Destination Network Address Translation. The kernel rewrites
+        the destination IP and port of outbound packets before they leave, redirecting
+        them into mitmproxy.
+
+        Two-network design: ai_boundary is internal true, no gateway, no internet,
+        container to container only. ai_egress is a standard bridge with a gateway,
+        mitmproxy's path out. Only mitmproxy bridges both.
+
+        NET_RAW lets a process open raw sockets and construct packets below the TCP
+        and UDP stack, bypassing iptables DNAT entirely. Dropping NET_RAW from the
+        workspace closes that gap.
+
+        The mitmproxy CA is installed into the system trust store at startup so curl,
+        Git, and Python all trust the MITM automatically. Node-based sidecars also
+        get NODE_EXTRA_CA_CERTS because official Node images don't honour the OS trust
+        store by default.
+      </aside>
     </div>
   )
 }

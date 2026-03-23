@@ -11,6 +11,10 @@ export default function Slide09ProblemSection() {
           <div style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.3)', borderRadius: '12px', padding: '0.7em 1.4em', fontSize: '1.25em', color: '#c8ddf2' }}>🔑 Git credentials in the workspace</div>
         </div>
       </div>
+      <aside className="notes">
+        Now that we understand what devcontainers give us, let's look at why autonomous
+        agents need additional controls on top.
+      </aside>
     </div>
   )
 }

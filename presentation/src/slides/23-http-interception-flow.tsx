@@ -54,6 +54,16 @@ export default function Slide14bHttpInterceptionFlow() {
       <div className="callout fragment" data-fragment-index={5} style={{ marginTop: '1em' }}>
         mitmproxy is the interception point. The agent does not get a direct outbound TCP path for normal web traffic.
       </div>
+      <aside className="notes">
+        TCP 80 and 443 are redirected into mitmproxy by iptables. The allowlist.py
+        addon checks host, path, and method on every request.
+
+        Allowed requests continue upstream. Blocked requests get a deny response,
+        so the agent sees the rejection immediately.
+
+        This is why HTTP_PROXY can't be ignored. The redirection happens at the kernel
+        level, not the application level.
+      </aside>
     </div>
   )
 }
