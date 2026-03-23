@@ -8,6 +8,10 @@ export default function Slide01Intro() {
           <span className="speaker-name">Sachit Vithaldas</span>
         </div>
       </div>
+      <aside className="notes">
+        Hello, I'm Sachit Vithaldas, a Software Engineer. I'd like to talk to you
+        today about how I sandbox OpenCode to develop with agents in a secure manner.
+      </aside>
     </div>
   )
 }

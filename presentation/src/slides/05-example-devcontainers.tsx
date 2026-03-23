@@ -38,6 +38,18 @@ RUN apt-get update && apt-get install -y curl`}</pre>
           </div>
         </div>
       </div>
+      <aside className="notes">
+        This is the bare minimum shape of a devcontainer.
+
+        On the left, you can point directly at a base image in devcontainer.json.
+        On the right, you can build from your own Dockerfile instead.
+
+        The rest of the properties are the knobs you already expect: mounts,
+        environment variables, forwarded ports, and lifecycle commands.
+
+        The point is that the format is simple. You can start small and layer more
+        structure on top as the environment gets more complex.
+      </aside>
     </div>
   )
 }

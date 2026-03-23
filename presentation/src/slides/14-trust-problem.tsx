@@ -23,6 +23,21 @@ export default function Slide11TrustProblem() {
           </div>
         </div>
       </div>
+      <aside className="notes">
+        The risk isn't only a malicious model. It's also prompt injection from
+        external content the model reads, model errors, or simply overly broad access
+        that an accident can exploit.
+
+        Four concrete threat surfaces: arbitrary outbound HTTP, secret leakage from
+        mounted files, Git credential abuse, and DNS exfiltration.
+
+        DNS is easy to overlook. Small UDP queries bypass HTTP allowlists entirely
+        because DNS is not HTTP. Secrets encoded as subdomain labels are invisible
+        to mitmproxy.
+
+        The blast radius of a mistake scales directly with how much access the agent
+        was given.
+      </aside>
     </div>
   )
 }

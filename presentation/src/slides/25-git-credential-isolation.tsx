@@ -35,6 +35,23 @@ export default function Slide18GitCredentialIsolation() {
         🔑 The agent gets <strong>operations, not credentials</strong>.
         It calls broker tools via MCP, but never holds the key that makes the push possible.
       </div>
+      <aside className="notes">
+        Authenticated Git access is high-leverage. A leaked key or token can push to
+        any branch, rewrite history, or delete refs.
+
+        Two goals: don't leak the key, the workspace never holds it. And don't push
+        to arbitrary repos, the broker validates origin and branch before every operation.
+
+        The git-broker is a separate container with a dedicated deploy key mounted
+        read-only from the host. It exposes narrow MCP tools: describe_push_policy,
+        fetch_origin, push_current_head.
+
+        The agent gets operations, not credentials. It calls broker tools via MCP
+        but never holds the key that makes the push possible.
+
+        Host-side scripts automate deploy key creation and revocation via the GitHub
+        API. No manual key management.
+      </aside>
     </div>
   )
 }

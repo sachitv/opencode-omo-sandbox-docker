@@ -23,6 +23,26 @@ export default function Slide20HonestTradeoffs() {
           </ul>
         </div>
       </div>
+      <aside className="notes">
+        The project doesn't claim perfect containment. It claims meaningful controls
+        layered on a familiar workflow.
+
+        If an allowlisted endpoint gets compromised or cooperates with an attacker,
+        it can exfiltrate data on behalf of the agent. The sandbox can't prevent that.
+
+        If a DNS-over-HTTPS resolver endpoint ever enters the allowlist, DNS becomes
+        an application-layer exfiltration channel over HTTPS 443.
+
+        A github.com allowlist entry permits DNS queries for the whole github.com
+        zone, not just that exact host. Tightening to exact-host DNS policy would
+        require more complex CoreDNS configuration.
+
+        Kernel exploits or container escapes: if the kernel or container runtime is
+        compromised, all bets are off. This is a developer sandbox, not a VM boundary.
+
+        Every new MCP server or package registry added to the allowlist widens the
+        attack surface. Review additions carefully.
+      </aside>
     </div>
   )
 }

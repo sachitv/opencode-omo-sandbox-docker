@@ -43,6 +43,9 @@ export default function Slide26ThankYou() {
         <hr style={{ width: '100%', border: 'none', borderTop: '1px solid var(--border)', margin: '0.2em 0' }} />
         <span style={{ color: 'var(--ink)', fontSize: '1.6em', fontWeight: 700 }}>Sachit Vithaldas</span>
       </div>
+      <aside className="notes">
+        Thank the audience, invite questions, and point them to the repo and LinkedIn QR codes.
+      </aside>
     </div>
   )
 }

@@ -13,6 +13,11 @@ export default function Slide25Takeaways() {
           <li>✨ Practical containment beats theoretical perfection — these controls are <strong>composable and incrementally adoptable</strong></li>
         </ul>
       </div>
+      <aside className="notes">
+        We covered a lot of ground, and these are the key takeaways I hope you leave with.
+
+        I hope this presentation was informative. Thank you for your time.
+      </aside>
     </div>
   )
 }

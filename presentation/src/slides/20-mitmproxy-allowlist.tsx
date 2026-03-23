@@ -57,6 +57,28 @@ example.com:
           </div>
         </div>
       </div>
+      <aside className="notes">
+        The allowlist is default-deny. Anything not explicitly listed is blocked.
+
+        It supports exact hostnames, wildcard subdomains, path prefixes, method
+        restrictions, and deny-list mode for specific paths.
+
+        Policy is baked into the mitmproxy image at build time. Changing it requires
+        a rebuild. That's intentional. It prevents runtime drift and makes policy
+        changes visible in git history.
+
+        GitHub is restricted to GET and HEAD only. This closes the vector where an
+        agent reads a repo containing a PAT and uses it to push via HTTPS or call
+        write endpoints on the REST API. The git-broker uses SSH over port 443 with
+        a UID-based iptables exception, so it's unaffected.
+
+        Raw IP addresses are always blocked, even with a global wildcard rule. The
+        allowlist matches the HTTP Host header, the hostname the client declares, not
+        the IP it connects to.
+
+        QUIC and HTTP/3 run over UDP, not TCP. iptables DNAT only intercepts TCP on
+        80 and 443. UDP 80 and 443 are explicitly dropped so clients fall back to TCP.
+      </aside>
     </div>
   )
 }
