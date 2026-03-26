@@ -2,7 +2,7 @@ export default function Slide31VsCodePortForwarding() {
   return (
     <div className="slide" style={{ display: 'flex', flexDirection: 'column' }}>
       <h2>🚏 VS Code Port Forwarding</h2>
-      <p className="lede">Host-side forwarding can bypass the network boundary entirely.</p>
+      <p className="lede">Host-side forwarding can create a path outside the container&apos;s normal egress controls.</p>
 
       <div className="grid two-up" style={{ flex: 1, alignItems: 'start', fontSize: '1.2em' }}>
         <div className="card bad">
@@ -11,7 +11,7 @@ export default function Slide31VsCodePortForwarding() {
             <li>A process inside the workspace opens a listening port</li>
             <li>VS Code can auto-forward <code>host:PORT → container:PORT</code></li>
             <li>That channel originates from the host side, not from inside the sandbox namespace</li>
-            <li>So it can expose files, secrets, or HTTP services without touching <code>mitmproxy</code></li>
+            <li>So a service in the container can become reachable through a host-side forwarded port without going through <code>mitmproxy</code></li>
           </ul>
         </div>
 
@@ -29,15 +29,19 @@ export default function Slide31VsCodePortForwarding() {
       </div>
 
       <div className="callout" style={{ marginTop: '1em' }}>
-        This is a good example of the difference between <strong>container egress controls</strong> and <strong>editor convenience features</strong>.
+        Usually this is a <strong>local exposure first</strong>, not automatic internet exfiltration — but it still sits outside the sandbox&apos;s normal outbound path.
       </div>
 
       <aside className="notes">
         The important nuance is that VS Code port forwarding does not look like normal outbound
         traffic from inside the namespace. The host editor notices a listening port and forwards it.
 
-        That means you can accidentally create a path around the sandbox controls unless you keep
-        forwarding explicit and intentional.
+        In many cases that forwarded port is only reachable from localhost, so this is not automatic
+        internet exfiltration by itself. The practical issue is that it creates a host-side access
+        path outside the sandbox&apos;s normal egress controls.
+
+        That means you can accidentally expose a container service locally unless you keep forwarding
+        explicit and intentional.
       </aside>
     </div>
   )
