@@ -11,8 +11,8 @@ import Slide04WhatIsDevcontainer from './slides/04-what-is-devcontainer'
 import Slide05ExampleDevcontainers from './slides/05-example-devcontainers'
 import Slide06DockerComposeDevcontainer from './slides/06-docker-compose-devcontainer'
 import Slide07HowVscodeRuns from './slides/07-how-vscode-runs'
-import Slide08WhyTeamsUse from './slides/08-why-teams-use'
 import Slide09WhatDevcontainersWereMeantToSolve from './slides/09-what-devcontainers-were-meant-to-solve'
+import Slide08WhyTeamsUse from './slides/08-why-teams-use'
 import Slide10DevcontainerAgentWorkflow from './slides/10-devcontainer-agent-workflow'
 import Slide11WhatDevcontainersDontGive from './slides/11-what-devcontainers-dont-give'
 import Slide12ProblemSection from './slides/12-problem-section'
@@ -32,6 +32,10 @@ import Slide25GitCredentialIsolation from './slides/25-git-credential-isolation'
 import Slide26HonestTradeoffs from './slides/26-honest-tradeoffs'
 import Slide27Takeaways from './slides/27-takeaways'
 import Slide28ThankYou from './slides/28-thank-you'
+import Slide29AppendixSection from './slides/29-appendix-section'
+import Slide31VsCodePortForwarding from './slides/31-vscode-port-forwarding'
+import Slide32DeployKeyLifecycle from './slides/32-deploy-key-lifecycle'
+import Slide33RawIpBlocking from './slides/33-raw-ip-blocking'
 
 export default function App() {
   const revealNotes = createRevealNotesAspectFix(1600, 1000)
@@ -74,12 +78,6 @@ export default function App() {
         <Slide06DockerComposeDevcontainer />
       </Slide>
       <Slide>
-        <Slide07HowVscodeRuns />
-      </Slide>
-      <Slide>
-        <Slide08WhyTeamsUse />
-      </Slide>
-      <Slide>
         <Slide09WhatDevcontainersWereMeantToSolve />
       </Slide>
       <Slide>
@@ -116,6 +114,9 @@ export default function App() {
         <Slide20MitmproxyAllowlist />
       </Slide>
       <Slide>
+        <Slide33RawIpBlocking />
+      </Slide>
+      <Slide>
         <Slide21DnsExfiltration />
       </Slide>
       <Slide>
@@ -131,6 +132,12 @@ export default function App() {
         <Slide25GitCredentialIsolation />
       </Slide>
       <Slide>
+        <Slide32DeployKeyLifecycle />
+      </Slide>
+      <Slide>
+        <Slide31VsCodePortForwarding />
+      </Slide>
+      <Slide>
         <Slide26HonestTradeoffs />
       </Slide>
       <Slide>
@@ -138,6 +145,15 @@ export default function App() {
       </Slide>
       <Slide>
         <Slide28ThankYou />
+      </Slide>
+      <Slide>
+        <Slide29AppendixSection />
+      </Slide>
+      <Slide>
+        <Slide07HowVscodeRuns />
+      </Slide>
+      <Slide>
+        <Slide08WhyTeamsUse />
       </Slide>
     </Deck>
   )

@@ -25,7 +25,7 @@ example.com:
 "*.example.com":`}</code></pre>
           </div>
           <div className="callout">
-            🔒 Policy is <strong>baked into the image</strong> at build time. Changing it requires a rebuild.
+            🔒 Policy is <strong>baked into the image</strong> at build time. Changing it requires a rebuild and recreate.
           </div>
         </div>
 
@@ -60,8 +60,8 @@ example.com:
         restrictions, and deny-list mode for specific paths.
 
         Policy is baked into the mitmproxy image at build time. Changing it requires
-        a rebuild. That's intentional. It prevents runtime drift and makes policy
-        changes visible in git history.
+        a rebuild and recreate. That's intentional. It prevents runtime drift and makes
+        policy changes visible in git history.
 
         GitHub is restricted to GET and HEAD only. This closes the vector where an
         agent reads a repo containing a PAT and uses it to push via HTTPS or call
