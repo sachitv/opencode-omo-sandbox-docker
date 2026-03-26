@@ -22,7 +22,11 @@
 #
 # Rules:
 #   - Positive paths (/foo) and negated paths (!/foo) cannot be mixed in one rule.
-#   - Path entries must start with / (or !/).
+#   - Path entries may be:
+#       /path              → any method on that path/prefix
+#       METHOD /path       → only that method on that path/prefix
+#       !/path             → deny any method on that path/prefix
+#       !METHOD /path      → deny only that method on that path/prefix
 #   - Duplicate patterns are a startup error.
 #   - Exact host + covering wildcard → warning (exact takes precedence).
 #   - Matching precedence: exact > wildcard subdomain (longest wins) > "*"

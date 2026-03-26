@@ -5,32 +5,37 @@ import { createRevealNotesAspectFix } from './reveal-notes-aspect-fix'
 
 import Slide01Intro from './slides/01-intro'
 import Slide02Disclaimer from './slides/02-disclaimer'
-import Slide03DevcontainersSection from './slides/03-devcontainers-section'
-import Slide04WhatIsDevcontainer from './slides/04-what-is-devcontainer'
-import Slide05ExampleDevcontainers from './slides/05-example-devcontainers'
-import Slide06DockerComposeDevcontainer from './slides/06-docker-compose-devcontainer'
-import Slide07HowVscodeRuns from './slides/07-how-vscode-runs'
-import Slide08WhyTeamsUse from './slides/08-why-teams-use'
-import Slide09WhatDevcontainersWereMeantToSolve from './slides/09-what-devcontainers-were-meant-to-solve'
-import Slide10DevcontainerAgentWorkflow from './slides/10-devcontainer-agent-workflow'
-import Slide11WhatDevcontainersDontGive from './slides/11-what-devcontainers-dont-give'
-import Slide12ProblemSection from './slides/12-problem-section'
-import Slide13AgenticTools from './slides/13-agentic-tools'
-import Slide14TrustProblem from './slides/14-trust-problem'
-import Slide15DesignGoal from './slides/15-design-goal'
-import Slide16SandboxSection from './slides/16-sandbox-section'
-import Slide17ArchitectureDiagram from './slides/17-architecture-diagram'
-import Slide18ArchitectureOverview from './slides/18-architecture-overview'
-import Slide19SharedNetworkNamespace from './slides/19-shared-network-namespace'
-import Slide20MitmproxyAllowlist from './slides/20-mitmproxy-allowlist'
+import Slide03WhyThisProject from './slides/03-why-this-project'
+import Slide04DevcontainersSection from './slides/04-devcontainers-section'
+import Slide05WhatIsDevcontainer from './slides/05-what-is-devcontainer'
+import Slide06ExampleDevcontainers from './slides/06-example-devcontainers'
+import Slide07DockerComposeDevcontainer from './slides/07-docker-compose-devcontainer'
+import Slide08WhatDevcontainersWereMeantToSolve from './slides/08-what-devcontainers-were-meant-to-solve'
+import Slide09DevcontainerAgentWorkflow from './slides/09-devcontainer-agent-workflow'
+import Slide10WhatDevcontainersDontGive from './slides/10-what-devcontainers-dont-give'
+import Slide11ProblemSection from './slides/11-problem-section'
+import Slide12AgenticTools from './slides/12-agentic-tools'
+import Slide13TrustProblem from './slides/13-trust-problem'
+import Slide14DesignGoal from './slides/14-design-goal'
+import Slide15SandboxSection from './slides/15-sandbox-section'
+import Slide16ArchitectureDiagram from './slides/16-architecture-diagram'
+import Slide17ArchitectureOverview from './slides/17-architecture-overview'
+import Slide18SharedNetworkNamespace from './slides/18-shared-network-namespace'
+import Slide19MitmproxyAllowlist from './slides/19-mitmproxy-allowlist'
+import Slide20RawIpBlocking from './slides/20-raw-ip-blocking'
 import Slide21DnsExfiltration from './slides/21-dns-exfiltration'
 import Slide22DnsQueryFlow from './slides/22-dns-query-flow'
 import Slide23HttpInterceptionFlow from './slides/23-http-interception-flow'
 import Slide24WhatGetsBlocked from './slides/24-what-gets-blocked'
 import Slide25GitCredentialIsolation from './slides/25-git-credential-isolation'
-import Slide26HonestTradeoffs from './slides/26-honest-tradeoffs'
-import Slide27Takeaways from './slides/27-takeaways'
-import Slide28ThankYou from './slides/28-thank-you'
+import Slide26DeployKeyLifecycle from './slides/26-deploy-key-lifecycle'
+import Slide27VsCodePortForwarding from './slides/27-vscode-port-forwarding'
+import Slide28HonestTradeoffs from './slides/28-honest-tradeoffs'
+import Slide29Takeaways from './slides/29-takeaways'
+import Slide30ThankYou from './slides/30-thank-you'
+import Slide31AppendixSection from './slides/31-appendix-section'
+import Slide32HowVscodeRuns from './slides/32-how-vscode-runs'
+import Slide33WhyTeamsUse from './slides/33-why-teams-use'
 
 export default function App() {
   const revealNotes = createRevealNotesAspectFix(1600, 1000)
@@ -58,58 +63,58 @@ export default function App() {
         <Slide02Disclaimer />
       </Slide>
       <Slide>
-        <Slide03DevcontainersSection />
+        <Slide03WhyThisProject />
       </Slide>
       <Slide>
-        <Slide04WhatIsDevcontainer />
+        <Slide04DevcontainersSection />
       </Slide>
       <Slide>
-        <Slide05ExampleDevcontainers />
+        <Slide05WhatIsDevcontainer />
       </Slide>
       <Slide>
-        <Slide06DockerComposeDevcontainer />
+        <Slide06ExampleDevcontainers />
       </Slide>
       <Slide>
-        <Slide07HowVscodeRuns />
+        <Slide07DockerComposeDevcontainer />
       </Slide>
       <Slide>
-        <Slide08WhyTeamsUse />
+        <Slide08WhatDevcontainersWereMeantToSolve />
       </Slide>
       <Slide>
-        <Slide09WhatDevcontainersWereMeantToSolve />
+        <Slide09DevcontainerAgentWorkflow />
       </Slide>
       <Slide>
-        <Slide10DevcontainerAgentWorkflow />
+        <Slide10WhatDevcontainersDontGive />
       </Slide>
       <Slide>
-        <Slide11WhatDevcontainersDontGive />
+        <Slide11ProblemSection />
       </Slide>
       <Slide>
-        <Slide12ProblemSection />
+        <Slide12AgenticTools />
       </Slide>
       <Slide>
-        <Slide13AgenticTools />
+        <Slide13TrustProblem />
       </Slide>
       <Slide>
-        <Slide14TrustProblem />
+        <Slide14DesignGoal />
       </Slide>
       <Slide>
-        <Slide15DesignGoal />
+        <Slide15SandboxSection />
       </Slide>
       <Slide>
-        <Slide16SandboxSection />
+        <Slide16ArchitectureDiagram />
       </Slide>
       <Slide>
-        <Slide17ArchitectureDiagram />
+        <Slide17ArchitectureOverview />
       </Slide>
       <Slide>
-        <Slide18ArchitectureOverview />
+        <Slide18SharedNetworkNamespace />
       </Slide>
       <Slide>
-        <Slide19SharedNetworkNamespace />
+        <Slide19MitmproxyAllowlist />
       </Slide>
       <Slide>
-        <Slide20MitmproxyAllowlist />
+        <Slide20RawIpBlocking />
       </Slide>
       <Slide>
         <Slide21DnsExfiltration />
@@ -127,13 +132,28 @@ export default function App() {
         <Slide25GitCredentialIsolation />
       </Slide>
       <Slide>
-        <Slide26HonestTradeoffs />
+        <Slide26DeployKeyLifecycle />
       </Slide>
       <Slide>
-        <Slide27Takeaways />
+        <Slide27VsCodePortForwarding />
       </Slide>
       <Slide>
-        <Slide28ThankYou />
+        <Slide28HonestTradeoffs />
+      </Slide>
+      <Slide>
+        <Slide29Takeaways />
+      </Slide>
+      <Slide>
+        <Slide30ThankYou />
+      </Slide>
+      <Slide>
+        <Slide31AppendixSection />
+      </Slide>
+      <Slide>
+        <Slide32HowVscodeRuns />
+      </Slide>
+      <Slide>
+        <Slide33WhyTeamsUse />
       </Slide>
     </Deck>
   )

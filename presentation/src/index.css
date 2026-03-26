@@ -485,14 +485,15 @@ code {
 
 .threat-label {
   font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-  font-size: 1.22em;
+  font-weight: 700;
+  font-size: 1.42em;
+  line-height: 1.3;
   color: var(--bad);
-  margin-bottom: 0.3em;
+  margin-bottom: 0.4em;
 }
 
 .threat-detail {
-  font-size: 1.08em;
+  font-size: 1em;
   color: #dbe7f4;
   line-height: 1.45;
 }
@@ -629,6 +630,79 @@ code {
 .arch-group.arch-static .arch-svc small {
   font-size: 0.95em;
   margin-top: 0.35em;
+}
+
+.arch-services-grouped {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.arch-svc-workspace {
+  grid-column: 1 / -1;
+}
+
+.arch-service-section {
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(180, 210, 240, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.arch-service-section-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.86em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.arch-service-section-proxy {
+  border-color: rgba(88, 166, 255, 0.3);
+  background: rgba(88, 166, 255, 0.08);
+}
+
+.arch-service-section-proxy .arch-service-section-label {
+  color: var(--accent);
+}
+
+.arch-service-section-mcp {
+  border-color: rgba(240, 180, 41, 0.32);
+  background: rgba(240, 180, 41, 0.09);
+}
+
+.arch-service-section-mcp .arch-service-section-label {
+  color: var(--amber);
+}
+
+.arch-service-section-git {
+  border-color: rgba(63, 185, 80, 0.32);
+  background: rgba(63, 185, 80, 0.1);
+}
+
+.arch-service-section-git .arch-service-section-label {
+  color: var(--good);
+}
+
+.arch-services-nested {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.arch-svc-proxy {
+  border-color: rgba(88, 166, 255, 0.34);
+  background: rgba(88, 166, 255, 0.12);
+}
+
+.arch-svc-mcp {
+  border-color: rgba(240, 180, 41, 0.34);
+  background: rgba(240, 180, 41, 0.12);
+}
+
+.arch-svc-git {
+  border-color: rgba(63, 185, 80, 0.36);
+  background: rgba(63, 185, 80, 0.14);
 }
 
 .arch-policy-stack {

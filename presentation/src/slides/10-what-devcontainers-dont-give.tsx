@@ -1,7 +1,7 @@
 export default function Slide08WhatDevcontainersDontGive() {
   return (
     <div className="slide" style={{ display: 'flex', flexDirection: 'column' }}>
-      <h2>🚫 What Devcontainers Don't Give You</h2>
+      <h2>🧭 Devcontainer Configuration</h2>
       <p className="lede">Containerized ≠ sandboxed.</p>
       <div className="grid two-up" style={{ marginTop: '0.8em', flex: 1, fontSize: '1.4em' }}>
         <div className="card bad">
