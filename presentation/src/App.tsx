@@ -5,6 +5,7 @@ import { createRevealNotesAspectFix } from './reveal-notes-aspect-fix'
 
 import Slide01Intro from './slides/01-intro'
 import Slide02Disclaimer from './slides/02-disclaimer'
+import Slide02bWhyThisProject from './slides/02b-why-this-project'
 import Slide03DevcontainersSection from './slides/03-devcontainers-section'
 import Slide04WhatIsDevcontainer from './slides/04-what-is-devcontainer'
 import Slide05ExampleDevcontainers from './slides/05-example-devcontainers'
@@ -56,6 +57,9 @@ export default function App() {
       </Slide>
       <Slide>
         <Slide02Disclaimer />
+      </Slide>
+      <Slide>
+        <Slide02bWhyThisProject />
       </Slide>
       <Slide>
         <Slide03DevcontainersSection />

@@ -28,7 +28,8 @@ const boxStyle = (color: string, bg: string) => ({
 export default function Slide19WhatGetsBlocked() {
   return (
     <div className="slide" style={{ display: 'flex', flexDirection: 'column' }}>
-      <h2>🚦 What Gets Blocked — and What Doesn't</h2>
+      <h2>🧪 Practical Outcome: What Works and What Doesn't</h2>
+      <p className="lede">After all of those controls, the important question is: can the agent still do useful work?</p>
       <div className="grid two-up" style={{ flex: 1, gap: '1.2em', alignItems: 'start', fontSize: '1.56em' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
           <p className="terminal-label" style={{ color: 'var(--bad)', margin: 0 }}>🚫 Blocked</p>
