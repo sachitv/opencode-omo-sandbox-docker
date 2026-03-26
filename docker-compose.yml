@@ -105,7 +105,7 @@ services:
       # allowing fetch/push operations on behalf of the agent.
       - .:/repo:cached
       # Mount only the recorded deploy-key policy state from the host.
-      - ${HOME}/.local/state/opencode-sandbox:/host-agent-state
+      - ${HOME}/.local/state/opencode-sandbox:/host-agent-state:ro
       # Mount the dedicated deploy private key read-only only into the broker.
       - ${HOME}/.local/share/opencode-sandbox/keys:/host-agent-keys:ro
 
