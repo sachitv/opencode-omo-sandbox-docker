@@ -955,3 +955,80 @@ class TestLoadHook:
         with patch("allowlist.ctx"):
             load(None)
             assert all(r.pattern != "stale.com" for r in allowlist._rules)
+
+
+# ---------------------------------------------------------------------------
+# Comment examples from allow-list.yaml — integration tests
+# Each test maps to a named example in the comment block of allow-list.yaml.
+# ---------------------------------------------------------------------------
+
+class TestCommentExamples:
+    """Integration tests covering each named example in the allow-list.yaml comments."""
+
+    # --- Allow only specific path prefixes (allow-list mode) ---
+    # api.github.com:
+    #   - /repos/
+    #   - /user
+
+    def test_allow_list_trailing_slash_allows_deep_subtree(self, monkeypatch):
+        # /repos/ should allow /repos/owner/name (multi-level deep) but block /gists
+        _set_rules(monkeypatch, [_allow_rule(
+            "api.github.com",
+            PathEntry("/repos/"),
+            PathEntry("/user"),
+        )])
+        assert _is_allowed("api.github.com", "GET", "/repos/owner/name") is True
+        assert _is_allowed("api.github.com", "GET", "/user") is True
+        assert _is_allowed("api.github.com", "GET", "/user/profile") is True
+        assert _is_allowed("api.github.com", "GET", "/gists") is False
+
+    # --- Allow a specific file ---
+    # example.me:
+    #   - /a/x.png    # matches /a/x.png and /a/x.png?v=2 but NOT /a/x.png.evil
+
+    def test_specific_file_allows_query_string_blocks_evil_extension(self, monkeypatch):
+        _set_rules(monkeypatch, [_allow_rule("example.me", PathEntry("/a/x.png"))])
+        assert _is_allowed("example.me", "GET", "/a/x.png") is True
+        assert _is_allowed("example.me", "GET", "/a/x.png?v=2") is True
+        assert _is_allowed("example.me", "GET", "/a/x.png.evil") is False
+
+    # --- Allow a specific file with method restriction ---
+    # example.me:
+    #   - GET /a/x.png    # same but restricted to GET only
+
+    def test_specific_file_method_restricted(self, monkeypatch):
+        _set_rules(monkeypatch, [_allow_rule("example.me", PathEntry("/a/x.png", method="GET"))])
+        assert _is_allowed("example.me", "GET", "/a/x.png") is True
+        assert _is_allowed("example.me", "GET", "/a/x.png?v=2") is True
+        assert _is_allowed("example.me", "POST", "/a/x.png") is False
+
+    # --- Allow a whole subtree ---
+    # assets.example.me:
+    #   - /static/    # matches /static/css/app.css, /static/js/app.js, etc.
+
+    def test_subtree_trailing_slash_matches_deep_paths(self, monkeypatch):
+        _set_rules(monkeypatch, [_allow_rule("assets.example.me", PathEntry("/static/"))])
+        assert _is_allowed("assets.example.me", "GET", "/static/css/app.css") is True
+        assert _is_allowed("assets.example.me", "GET", "/static/js/app.js") is True
+        assert _is_allowed("assets.example.me", "GET", "/other/file.js") is False
+
+    # --- Deny-list mode ---
+    # example.me:
+    #   - !/admin     # blocks any method to /admin and /admin/*, allows everything else
+
+    def test_deny_list_admin_blocks_subpaths(self, monkeypatch):
+        _set_rules(monkeypatch, [_deny_rule("example.me", PathEntry("/admin"))])
+        assert _is_allowed("example.me", "GET", "/admin") is False
+        assert _is_allowed("example.me", "POST", "/admin/settings") is False
+        assert _is_allowed("example.me", "DELETE", "/admin/users") is False
+        assert _is_allowed("example.me", "GET", "/public") is True
+
+    # --- Deny-list mode with method restriction ---
+    # example.me:
+    #   - !DELETE /data/   # blocks DELETE to /data/ subtree only
+
+    def test_deny_list_method_specific_allows_other_methods(self, monkeypatch):
+        _set_rules(monkeypatch, [_deny_rule("example.me", PathEntry("/data/", method="DELETE"))])
+        assert _is_allowed("example.me", "DELETE", "/data/item") is False
+        assert _is_allowed("example.me", "GET", "/data/item") is True
+        assert _is_allowed("example.me", "POST", "/data/report") is True
