@@ -305,6 +305,21 @@ def _check_conflicts(rules: list[HostRule]) -> None:
                         f"'{_entry_label(entry_b)}' and is redundant"
                     )
 
+    # Warn about path entries that can never match.  Request paths are normalised
+    # before matching (double slashes collapsed, percent-encoding decoded), but
+    # PathEntry.path is stored verbatim.  A rule path containing '//' or a '%xx'
+    # sequence can therefore never equal a normalised request path — it is a dead
+    # rule that silently provides no protection.
+    for rule in rules:
+        for entry in rule.paths:
+            if "//" in entry.path or "%" in entry.path:
+                ctx.log.warn(
+                    f"[allowlist] Rule '{rule.pattern}': "
+                    f"path '{_entry_label(entry)}' contains '//' or a percent-encoded "
+                    f"character — request paths are normalised before matching, so this "
+                    f"entry can never match and is a dead rule"
+                )
+
 
 def _load_policy() -> list[HostRule]:
     raw = yaml.load(POLICY_PATH.read_text(encoding="utf-8"), Loader=_NoDuplicatesLoader)

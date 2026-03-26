@@ -652,6 +652,29 @@ class TestCheckConflicts:
             warns = [c[0][0] for c in mock_ctx.log.warn.call_args_list]
             assert not any("redundant" in w for w in warns)
 
+    # --- dead-rule warnings for normalised-away paths ---
+
+    def test_double_slash_path_entry_warns_dead_rule(self):
+        rules = [_allow_rule("example.com", PathEntry("//admin"))]
+        with patch("allowlist.ctx") as mock_ctx:
+            _check_conflicts(rules)
+            warns = [c[0][0] for c in mock_ctx.log.warn.call_args_list]
+            assert any("//admin" in w and "dead rule" in w for w in warns)
+
+    def test_percent_encoded_path_entry_warns_dead_rule(self):
+        rules = [_allow_rule("example.com", PathEntry("/%61dmin"))]
+        with patch("allowlist.ctx") as mock_ctx:
+            _check_conflicts(rules)
+            warns = [c[0][0] for c in mock_ctx.log.warn.call_args_list]
+            assert any("/%61dmin" in w and "dead rule" in w for w in warns)
+
+    def test_normal_path_entry_no_dead_rule_warning(self):
+        rules = [_allow_rule("example.com", PathEntry("/admin"))]
+        with patch("allowlist.ctx") as mock_ctx:
+            _check_conflicts(rules)
+            warns = [c[0][0] for c in mock_ctx.log.warn.call_args_list]
+            assert not any("dead rule" in w for w in warns)
+
 
 # ---------------------------------------------------------------------------
 # duplicate path entry → hard error
