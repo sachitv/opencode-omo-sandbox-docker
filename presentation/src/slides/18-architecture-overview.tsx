@@ -10,15 +10,29 @@ export default function Slide14ArchitectureOverview() {
       <div className="arch-stage">
         <div className="arch-group arch-static" style={{ border: '2px solid rgba(88, 166, 255, 0.5)', boxShadow: '0 0 24px rgba(88, 166, 255, 0.1)' }}>
           <div className="arch-group-label">Workspace Services</div>
-          <div className="arch-services">
-            <div className="arch-svc primary">
+          <div className="arch-services-grouped">
+            <div className="arch-svc primary arch-svc-workspace">
               workspace
-              <small>OpenCode runs here</small>
+              <small>OpenCode + Oh My OpenCode runs here</small>
             </div>
-            <div className="arch-svc">openrouter-proxy<small>:4000 model access</small></div>
-            <div className="arch-svc">perplexity-mcp<small>:8081 local MCP</small></div>
-            <div className="arch-svc">brave-search-mcp<small>:8083 local MCP</small></div>
-            <div className="arch-svc">git-broker<small>:8082 controlled Git auth</small></div>
+
+            <div className="arch-service-section arch-service-section-proxy">
+              <div className="arch-service-section-label">LLM Proxy</div>
+              <div className="arch-svc arch-svc-proxy">openrouter-proxy<small>:4000 model access</small></div>
+            </div>
+
+            <div className="arch-service-section arch-service-section-mcp">
+              <div className="arch-service-section-label">MCPs</div>
+              <div className="arch-services arch-services-nested">
+                <div className="arch-svc arch-svc-mcp">perplexity-mcp<small>:8081 local MCP</small></div>
+                <div className="arch-svc arch-svc-mcp">brave-search-mcp<small>:8083 local MCP</small></div>
+              </div>
+            </div>
+
+            <div className="arch-service-section arch-service-section-git">
+              <div className="arch-service-section-label">Git Operations</div>
+              <div className="arch-svc arch-svc-git">git-broker<small>:8082 controlled Git auth</small></div>
+            </div>
           </div>
         </div>
 

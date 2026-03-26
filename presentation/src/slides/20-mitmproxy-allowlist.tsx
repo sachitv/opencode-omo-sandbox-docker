@@ -9,24 +9,20 @@ export default function Slide16MitmproxyAllowlist() {
             <h3>📋 Example policy</h3>
             <pre style={{ margin: 0, fontSize: '0.7em' }}><code className="language-yaml">{`# allow-list.yaml
 
-# whole host — all paths allowed
+# allow all
 openrouter.ai:
 
-# wildcard subdomain
-"*.npmjs.com":
-
-# GitHub: read-only — GET/HEAD only
-# blocks push via HTTPS even if agent finds a PAT
+# allow specific methods on a path/prefix
 github.com:
-  - GET /
-  - HEAD /
-api.github.com:
-  - GET /
+  - GET /foo
   - HEAD /
 
-# deny-list: allow all except /admin
+# deny-list mode
 example.com:
-  - !/admin`}</code></pre>
+  - !/admin
+
+# wildcard subdomain
+"*.example.com":`}</code></pre>
           </div>
           <div className="callout">
             🔒 Policy is <strong>baked into the image</strong> at build time. Changing it requires a rebuild.
