@@ -179,6 +179,8 @@ services:
       - ai_egress
 
 networks:
+  # Intent only — enforcement is via iptables inside the shared namespace,
+  # not Docker network membership.
   ai_boundary:
     internal: true
   ai_egress: {}

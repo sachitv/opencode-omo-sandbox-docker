@@ -1,7 +1,9 @@
 import { Deck, Slide } from '@revealjs/react'
 import 'reveal.js/reveal.css'
+import 'reveal.js/plugin/highlight/monokai.css'
 import './index.css'
 import { createRevealNotesAspectFix } from './reveal-notes-aspect-fix'
+import RevealHighlight from 'reveal.js/plugin/highlight'
 
 import Slide01Intro from './slides/01-intro'
 import Slide02Disclaimer from './slides/02-disclaimer'
@@ -54,7 +56,7 @@ export default function App() {
         transition: 'slide',
         backgroundTransition: 'fade',
       }}
-      plugins={[revealNotes]}
+      plugins={[revealNotes, RevealHighlight()]}
     >
       <Slide>
         <Slide01Intro />

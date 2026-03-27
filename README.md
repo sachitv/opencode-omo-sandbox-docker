@@ -91,10 +91,13 @@ flowchart LR
 
 ### Network Boundary
 
-The `ai_boundary` Docker network is marked `internal: true`. The `workspace`,
-`openrouter-proxy`, `perplexity-mcp`, `brave-search-mcp`, `coredns`, and `git-broker` services all use
-`network_mode: "service:mitmproxy"`, so they share the `mitmproxy` network
-namespace instead of getting their own independent egress path.
+All services except `mitmproxy` use `network_mode: "service:mitmproxy"`, so they
+share the `mitmproxy` network namespace instead of getting their own independent
+network stack. Because they share a namespace rather than joining a Docker network,
+`ai_boundary` has no enforcement effect on any service — the actual enforcement is
+done entirely by iptables rules inside the shared namespace. `ai_egress` gives
+`mitmproxy` its internet path; `ai_boundary` (`internal: true`) communicates intent
+only.
 
 Inside that shared namespace:
 
