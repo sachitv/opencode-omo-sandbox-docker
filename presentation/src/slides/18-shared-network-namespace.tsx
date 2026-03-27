@@ -21,6 +21,7 @@ services:
     network_mode: "service:mitmproxy"
 
 networks:
+  # ai_boundary: intent only
   ai_boundary:
     internal: true
   ai_egress: {}`}</code></pre>
@@ -40,9 +41,9 @@ networks:
           <div className="card">
             <h3>🌐 Two-network design</h3>
             <ul>
-              <li><code>ai_boundary</code> — <code>internal: true</code>, no gateway, no internet</li>
               <li><code>ai_egress</code> — standard bridge, mitmproxy's internet path</li>
-              <li>Only mitmproxy bridges both — no direct egress for anything else</li>
+              <li><code>ai_boundary</code> — <code>internal: true</code>, intent only; enforcement is via iptables, not Docker networking</li>
+              <li>Enforcement is entirely via iptables inside the shared namespace</li>
             </ul>
           </div>
         </div>
@@ -59,9 +60,11 @@ networks:
         the destination IP and port of outbound packets before they leave, redirecting
         them into mitmproxy.
 
-        Two-network design: ai_boundary is internal true, no gateway, no internet,
-        container to container only. ai_egress is a standard bridge with a gateway,
-        mitmproxy's path out. Only mitmproxy bridges both.
+        Two-network design: ai_egress is a standard bridge with a gateway,
+        mitmproxy's path out. ai_boundary is internal true and communicates intent,
+        but has no enforcement effect — services share mitmproxy's namespace rather
+        than joining a Docker network, so Docker network membership is irrelevant to
+        them. All enforcement is done by iptables inside the shared namespace.
 
         NET_RAW lets a process open raw sockets and construct packets below the TCP
         and UDP stack, bypassing iptables DNAT entirely. Dropping NET_RAW from the
