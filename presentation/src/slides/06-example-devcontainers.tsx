@@ -5,7 +5,7 @@ export default function Slide03cExampleDevcontainers() {
       <div className="grid two-up" style={{ marginTop: '1em', flex: 1 }}>
         <div className="card">
           <h3 style={{ fontSize: '2.25em' }}>📦 With a base image</h3>
-          <pre style={{ margin: 0, fontSize: '1.21em', lineHeight: 1.7, padding: '1em' }}>{`// .devcontainer/devcontainer.json
+          <pre style={{ margin: 0, fontSize: '1.0em', lineHeight: 1.7, padding: '1em' }}><code className="language-json">{`// .devcontainer/devcontainer.json
 {
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 
@@ -14,12 +14,12 @@ export default function Slide03cExampleDevcontainers() {
   // "containerEnv": {},
   // "forwardPorts": [],
   // "postCreateCommand": ""
-}`}</pre>
+}`}</code></pre>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8em' }}>
-          <div className="card">
+          <div className="card" style={{ flex: 1 }}>
             <h3 style={{ fontSize: '2.25em' }}><img src={`${import.meta.env.BASE_URL}docker.svg`} alt="" aria-hidden="true" style={{ width: '1em', height: '1em', verticalAlign: 'middle', marginRight: '0.3em' }} />With a Dockerfile</h3>
-            <pre style={{ margin: 0, fontSize: '1.44em', lineHeight: 1.7, padding: '1em' }}>{`// .devcontainer/devcontainer.json
+            <pre style={{ margin: 0, fontSize: '1.2em', lineHeight: 1.7, padding: '1em' }}><code className="language-json">{`// .devcontainer/devcontainer.json
 {
   "build": { "dockerfile": "Dockerfile" },
 
@@ -28,13 +28,13 @@ export default function Slide03cExampleDevcontainers() {
   // "containerEnv": {},
   // "forwardPorts": [],
   // "postCreateCommand": ""
-}`}</pre>
+}`}</code></pre>
           </div>
-          <div className="card">
+          <div className="card" style={{ flex: 1 }}>
             <h3 style={{ fontSize: '2.25em' }}>📝 Dockerfile</h3>
-            <pre style={{ margin: 0, fontSize: '1.44em', lineHeight: 1.7, padding: '1em' }}>{`# .devcontainer/Dockerfile
+            <pre style={{ margin: 0, fontSize: '1.2em', lineHeight: 1.7, padding: '1em' }}><code className="language-dockerfile">{`# .devcontainer/Dockerfile
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
-RUN apt-get update && apt-get install -y curl`}</pre>
+RUN apt-get update && apt-get install -y curl`}</code></pre>
           </div>
         </div>
       </div>
