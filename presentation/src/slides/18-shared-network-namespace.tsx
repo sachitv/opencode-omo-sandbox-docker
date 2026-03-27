@@ -8,7 +8,6 @@ export default function Slide15SharedNetworkNamespace() {
           <pre style={{ margin: 0 }}><code className="language-yaml">{`# docker-compose.yml
 services:
   mitmproxy:
-    # ai_boundary: intent only
     networks: [ai_boundary, ai_egress]
     cap_add: [NET_ADMIN]
 
@@ -22,6 +21,7 @@ services:
     network_mode: "service:mitmproxy"
 
 networks:
+  # ai_boundary: intent only
   ai_boundary:
     internal: true
   ai_egress: {}`}</code></pre>
