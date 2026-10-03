@@ -33,7 +33,7 @@ jobs:
         run: bun run build -- --base=/${{ github.event.repository.name }}/
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: presentation/dist
 
